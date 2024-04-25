@@ -1,0 +1,1697 @@
+program APILayer_Demo64_GEO_Severals_PostMultipartFormDataStream_Only;
+//{$IFDEF Lazarus}
+//  {$APPTYPE CONSOLE}  ☮ ✞ π 📌
+//{/$ENDIF}
+//https://apilayer.com/marketplace/image_to_text-api?txn=free&e=Sign%20Up&l=Success&live_demo=show
+//https://apilayer.com/marketplace/geo-api?live_demo=show
+//https://api-ninjas.com/api/randomimage
+//https://www.springcloud.io/post/2022-04/httpclient-multipart/#gsc.tab=0
+//https://stackoverflow.com/questions/3885703/post-method-winhttprequest-multipart-form-data
+//https://www.autoitscript.com/forum/topic/153314-multipart-file-uploading-using-winhttpwinhttprequest51/
+//https://blog.habarisoft.com/2019/02/18/single-file-upload-example-using-indy-tidhttp-and-multipart-form-data/
+//https://github.com/MagicFoundation/Alcinoe/blob/master/Demos/ALWinHTTPClient/_Source/Unit1.pas
+//https://stackoverflow.com/questions/50513261/post-data-and-file-to-rest-api-with-contenttype-multipart-mixed
+
+const
+  SUSERAgent = 'Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101';
+  SUSERAgent2 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0';
+  URL_APILAY = 'https://api.apilayer.com/image_to_text/url?url=%s'; 
+  URL_APILAY_GEO = 'https://api.apilayer.com/geo/country/capital/%s';  
+  URL_APILAY_EMO = 'https://api.api-ninjas.com/v1/emoji?name=%s';
+  URL_APILAY_IMG = 'https://api.api-ninjas.com/v1/randomimage?category=%s';
+  URL_APILAY_DETECT = 'https://api.api-ninjas.com/v1/objectdetection/';
+  URL_APILAY_TEXTSIM = 'https://api.api-ninjas.com/v1/textsimilarity/';
+  URL_APILAY_FACTS = 'https://api.api-ninjas.com/v1/facts?limit=%s';
+  URL_APILAY_FACTS2 = 'https://api.api-ninjas.com/v1/facts';
+  
+  N_APIKEY = 'gwM+25ePKBKfgnz40Q+s+w==sFarUVYdUdmV9m__';       //change on release !
+  
+  URLIMAGEPATH = 'http://www.kleiner.ch/kleiner/images/uml_buch.jpg';
+  URLIMAGEPATH2 = 'http://www.kleiner.ch/kleiner/patterns_klein.gif';
+  URLIMAGEPATH3 = 'https://breitschtv.wordpress.com/wp-content/uploads/2024/04/scripttest_latin_20240316_133552.jpg?w=768';
+  
+  TESTURL = 'https://graphical.weather.gov/xml/DWMLgen/schema/latest_DWML.txt';
+  TESTURL2 = 'https://maxbox4.wordpress.com/2024/03/06/geocoding-iv/';
+
+
+function GEO_to_text_API2_emoji(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  rets:= TStringStream.create('');
+  heads:= TStringlist.create;     
+  try 
+    heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Content-Type=application/json');
+    iht:= httpq.setHeaders(heads);
+    httpq.Get(Format(AURL,[urlencode(url_name)]), rets);
+    if httpq.getresponsecode=200 Then result:= rets.datastring
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+  end;                  
+end;                 //}
+
+function GEO_to_text_API2_randimage(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets, rets2: TMemoryStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  rets:= TMemoryStream.create;
+  rets2:= TMemoryStream.create;
+  heads:= TStringlist.create;     
+  try 
+    heads.add('X-Api-Key='+aAPIkey);
+    //heads.add('Accept=image/jpg');
+    iht:= httpq.setHeaders(heads);
+    httpq.Get(Format(AURL,[urlencode(url_name)]), rets);
+    if httpq.getresponsecode=200 Then begin
+       writeln('size of '+itoa(rets.size));
+       rets.Position:= 0;
+       ALMimeBase64decodeStream(rets, rets2)
+       //Base64decode(rets)
+       //StreamToBase64(rets)
+       rets2.savetofile((exepath+'randimage.jpg'));
+       openfile(exepath+'randimage.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+    rets2.Free;
+  end;                  
+end;                 //}
+
+
+function TextSimilarity_API6(AURL, url_name, aApikey: string): string;
+var
+  httpReq,hr: Olevariant;
+  JPostdatabody: string;
+  LJsonArray: TJsonArray;
+  jo: TJSON;
+begin
+  Result:= '';
+  JPostDataBody:= '{' +
+    '"text_1": "gpt-3.5-turbo-instruct",'+
+      //'"prompt": "%s",'+
+    '"text_2": "gpt-3.5-turbo-instruct777"'+
+    '}';
+
+  // Use JSON for REST API calls and set API KEY via requestheader
+  httpReq:= CreateOleObject('WinHttp.WinHttpRequest.5.1');
+  jo:= TJSON.Create();
+  try             
+    hr:= httpReq.Open('POST', AURL, false);
+    httpReq.setRequestheader('user-agent',SUSERAGENT);
+    // Select HTTPS POST method, set POST data, specify endpoint URL
+    httpReq.setRequestheader('content-type','application/json'); 
+    httpReq.setRequestheader('X-Api-Key',aApikey);
+    if hr= S_OK then HttpReq.Send(JPostDataBody);
+    If HttpReq.Status = 200 Then
+       result:= HttpReq.responseText
+    Else result:= 'Failed getresponse:'+itoa(HttpReq.Status)+HttpReq.responseText;
+      // writeln('debug response '+HttpReq.GetAllResponseHeaders); 
+      // Process returned JSON when request was successful 
+    jo.parse(result) 
+    result:='Answer2similarity: '+jo.values['similarity'].asstring;
+  finally
+    jo.Free;
+    httpreq:= unassigned;  
+  end;                
+end;
+
+function Facts_API25(AURL, limit, aApikey: string): string;
+var hq: THttpConnectionWinInet;
+    rets: TStringStream; heads: TStrings;
+    iht: IHttpConnection; 
+begin
+  hq:= THttpConnectionWinInet.Create(true); 
+  rets:= TStringStream.create('');
+  heads:= TStringlist.create;     
+  try 
+    heads.add('X-Api-Key='+aAPIkey);
+    //heads.add('Content-Type=application/json');
+    iht:= hq.setHeaders(heads);
+    //hq.Get(Format(AURL,[urlencode(limit)]), rets);
+     hq.Get(AURL, rets);
+    if hq.getresponsecode=200 Then result:= rets.datastring
+      else result:='Failed:'+
+             itoa(Hq.getresponsecode)+Hq.GetResponseHeader('message');
+  except  
+     writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    hq:= Nil;
+    heads.Free;
+    rets.Free;
+  end;                  
+end;                 //}
+
+
+function GEO_to_text_API2_randimage3(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TMemoryStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  rets:= TMemoryStream.create;
+  heads:= TStringlist.create;     
+  try 
+    heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=image/jpg');
+    iht:= httpq.setHeaders(heads);
+    httpq.Get(Format(AURL,[urlencode(url_name)]), rets);
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       //ALMimeBase64decodeStream(rets, rets2)
+       rets.savetofile((exepath+'randimage01.jpg'));
+       openfile(exepath+'randimage01.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+  end;                  
+end;                 //}
+
+function GEO_to_ImageDetect_MPart(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TMemoryStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+    LFormData : TidMultipartFormDataStream;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  LFormData := TidMultipartFormDataStream.Create();
+  //Params.AddFormField( 'documentmetadata', 'application/json', 'utf-8', RequestStream);
+    LFormData.AddFormField1('image', '{"id":submitimage}','','utf-8','');
+    LFormData.AddFile('files', exepath+'randimage01.jpg',GetMIMETypeFromFile(exepath+'randimage01.jpg')); 
+    // You can also use AddStream method if it's available
+  
+  rets:= TMemoryStream.create;
+  heads:= TStringlist.create;     
+  try 
+    heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=application/json, text/plain, */*');
+    iht:= httpq.setHeaders(heads);
+    httpq.Post(AURL, LFormData, rets);
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       //ALMimeBase64decodeStream(rets, rets2)
+       //rets.savetofile((exepath+'randimage01.jpg'));
+       openfile(exepath+'randimage01.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+    LFormData.Free;
+  end;                  
+end;                 //}
+
+function TALHTTPClient_Detect_multipart(feedstream, apiKey: string;
+                       aResponseContentStream:TStream;
+                       aResponseContentHeader:TALHTTPResponseHeader2):string;
+Var
+   FRequestHeader: TALHTTPRequestHeader;
+   afiles: TFileStream;  rets: TStringStream;
+   JPostdata: string; Files:TALMultiPartFormDataContents; areqfile: TALMultiPartFormDataContent;
+   reqfields: TALStrings;   aRespContHeader: TALHTTPResponseHeader2;
+begin
+  JPostData:= '{' +
+    '"model": "gpt-3.5-turbo-instruct",'+
+    //'"prompt": "' + AQuestion + '",'+
+    '"prompt": "%s",'+
+    '"max_tokens": 2048,'+
+    '"temperature": 0.1'+
+    '}';
+  
+  aReqFile:= TALMultiPartFormDataContent.create;  
+  areqfile.fieldname:= 'image';
+  areqfile.filename:= 'randimage0.jpg';
+  areqfile.loaddatafromfile(exepath+'randimage0.jpg') ; 
+  //  areqfile.ContentDisposition:= 'form-data; name="image"; files="'+areqfile.filename+'"';
+     areqfile.ContentDisposition:= 'form-data; submitimage; name="image"; files="'+areqfile.filename+'"';
+  
+   areqfile.ContentType:= 
+            ALGetDefaultMIMEContentTypeFromExt(ExtractFileExt(exepath+'randimage0.jpg'));
+   Files:= TALMultiPartFormDataContents.create;  
+  Files.add1(areqfile);  
+       
+  //TMemoryStream(aReqFile.DataStream).LoadFromFile(exepath+'randimage0.jpg');
+  writeln('file size '+itoa(areqfile.datastream.size)); 
+        
+   writeln('fieldname '+areqfile.fieldname)
+  //  writeln('fieldname '+areqfile.length)
+ 
+   rets:= TStringStream.create('');
+   reqfields:= TALStringlist.create;
+   reqfields.add('image=randimage0.jpg');
+   
+  with TALWininetHttpClient2.create do begin
+    //Url:= URL_APILAY_DETECT;
+    //RequestMethod:= HTTPmt_Post; //HTTPrm_Post;
+    //RequestHeader.UserAgent:= UAGENT;
+    //RequestHeader.ContentType:= 'multipart/form-data';
+    //RequestHeader.ContentType:= 'image/jpg';
+    //RequestHeader.ContentLength:= '2048';
+    //RequestHeader.Authorization:= 'Bearer '+ CHATGPT_APIKEY5;
+    RequestHeader.RawHeaderText:='X-Api-Key='+APIkey;
+    //RequestHeader.RawHeaderText:='files=image';
+    try
+      afiles:= TFileStream.create('./randimage0.jpg',fmOpenRead);
+      writeln('size of '+itoa(afiles.size));
+      
+     {  Procedure PostMultipartFormData(const aUrl:AnsiString;
+                                    const aRequestFields: TALStrings;
+                                    const aRequestFiles: TALMultiPartFormDataContents;
+                                    const aResponseContent: TStream;
+                                    const aResponseHeader: TALHTTPResponseHeader2;
+                                    const ARequestHeaderValues: TALNameValueArray = nil); overload;
+       }
+      try
+       // Post(URL_APILAY_DETECT, rets, nil, []); //overload;
+       // result:= Post3(URL_APILAY_DETECT, afiles, []); //overload;
+       
+       //result:= PostMultiPartFormData1(URL_APILAY_DETECT,reqfields, Files, []);
+       result:= PostMultiPartFormData1(URL_APILAY_DETECT,nil, Files, []);
+       
+     {    PostMultiPartFormData(URL_APILAY_DETECT, reqfields, Files, rets, 
+                                         aRespContHeader, []);
+         writeln('ret len '+aRespContHeader.contentlength)      //}                          
+        //result:= Get2(URL_APILAY_DETECT,  []); //overload;
+      except
+        writeln(result)
+        writeln(ExceptionToString(ExceptionType, ExceptionParam));
+      end;  
+      //PostMultiPartFormData1(URL_APILAY_DETECT, nil, nil, []);
+      //result:= get2(URL_APILAY_DETECT, []);
+    finally
+      Free;
+      afiles.Free;
+      rets.free;
+      reqfields.free;
+      Files.Free;
+    end; 
+  end; //with   
+end; 
+
+
+procedure PyCode(imgpath: string);
+begin
+  with TPythonEngine.Create(Nil) do begin
+  pythonhome:= 'C:\Users\breitsch\AppData\Local\Programs\Python\Python37-32\';
+  try
+    loadDLL;
+    ExecString('import requests');
+    ExecStr('url= "https://api.apilayer.com/image_to_text/url?url='+imgpath+'"'); 
+    ExecStr('payload = {}');  
+    ExecStr('headers= {"apikey": "dy5L70eQx72794XBZ8sewEgYTZR85___"}'); 
+    Println(EvalStr('requests.request("GET",url, headers=headers, data=payload).text'));  
+  except
+    raiseError;        
+  finally       
+    free;
+  end; 
+ end;
+end; 
+
+function PyCodeObjectDetect2(imgpath, aAPIKey: string): string;
+begin
+  with TPythonEngine.Create(Nil) do begin
+  //pythonhome:= 'C:\Users\User\AppData\Local\Programs\Python\Python312\';
+  try
+    loadDLL;
+    ExecString('import requests');
+    ExecStr('url= "https://api.api-ninjas.com/v1/objectdetection"'); 
+    ExecStr('image_file_descriptor = open("'+imgpath+'","rb")');  
+    ExecStr('headers= {"X-Api-Key":"'+aAPIKey+'"}'); 
+    ExecStr('files = {"image": image_file_descriptor}  ');
+    ExecStr('r = requests.post(url, headers=headers, files=files)');
+    result:= (EvalStr('r.json()')); 
+  except
+    raiseError;        
+  finally       
+    Free;
+  end; 
+ end;
+end; 
+
+
+procedure testmultipartformdata2(aapikey: string);
+  var
+  LParamToSend: TIdMultiPartFormDataStream;   
+  FHttp: TIDHTTP;
+begin
+   LParamToSend := TIdMultiPartFormDataStream.Create;
+   FHttp:=  TIDHTTP.create(self);
+
+   // example on connect.aerius.nl/api "POST receptorSets", where the upload of this file is fine:
+   // curl -X POST "https://connect.aerius.nl/api/v7/receptorSets" -H  "accept: application/json" 
+   //      -H "api-key: f6...c" -H "Content-Type: multipart/form-data" 
+   //      -F "receptorSet={"name": ... see below ...}" -F "filePart=@cFileName"
+
+   FHttp.HandleRedirects := True;   
+   FHttp.Request.Accept := 'application/json';
+   FHttp.Request.CustomHeaders.AddValue('X-Api-Key', aapikey);
+   //URL_APILAY_DETECT
+   fHTTP.Request.ContentType := 'application/x-www-form-urlencoded';
+   fHTTP.HTTPOptions := fHTTP.HTTPOptions + [hoForceEncodeParams];
+   LParamToSend.AddFormField2('receptorSet',
+              '{"name":"example","description":"testing","expectRcpHeight":false}','','','');
+   LParamToSend.AddFile2('files', exepath+'randimage0.jpg', '').ContentTransfer := '';;
+   try
+     Writeln(FHttp.PostMultipart(URL_APILAY_DETECT, LParamToSend));
+    //  Writeln(FHttp.PostStream(URL_APILAY_DETECT, LParamToSend));
+   
+   except
+      //on E: Exception do
+        // edtMemo.Text := edtMemo.Text + e.Message;
+        writeln(ExceptionToString(ExceptionType, ExceptionParam));
+      //https://stackoverflow.com/questions/51294056/error-connecting-with-ssl-using-indy-and-delphi-10   
+   end;
+   LParamToSend.Free;
+   FHttp.Free;
+end;
+
+function SendMediaMultiPartFormData: string;
+var
+  LRequest: TidHTTP;
+  LFormData: TIdMultiPartFormDataStream;
+  LResponse: TStringStream;
+begin
+  LRequest := TidHTTP.Create(self);
+  LFormData := TidMultipartFormDataStream.Create();
+  LResponse := TStringStream.Create('');
+  try
+    LFormData.AddFormField1('myJson', '{"id":1,"user":"Vinicius Sanchez"}','','','');
+    LFormData.AddFile('myFiles', 'C:\Samples\FormData\File.pdf',''); // You can also use AddStream method if it's available
+    result:= LRequest.PostStream('myUrl', LFormData);
+    //Result := LResponse.DataString;
+  finally
+    LFormData.Free;
+    LResponse.Free;
+    LRequest.Free;
+  end;
+end;
+
+const slinebreak= CRLF;
+function THelloWorldResourceSayHelloWorld(which: string): string;
+begin
+  Result :=
+    '<html>' + sLineBreak
+  + '<body>' + sLineBreak
+  + '  <h1>Multipart form-data demo</h1>' + sLineBreak
+  + '  <form action="./' + which + '" method="POST" enctype="multipart/form-data">' + sLineBreak
+  + '    <input type="text" name="json" value=''{"name": "Kleiner", "surname": "Max"}''/> <br/>' + sLineBreak
+  + '    <input type="file" name="image" />  <br/>' + sLineBreak
+  + '    <input type="submit" value="Submit" />' + sLineBreak
+  + '  </form>' + sLineBreak
+  + '</body>' + sLineBreak
+  + '</html>';
+end;
+
+
+{****************************************************************}
+function AnsiStrTo8bitUnicodeString(s: AnsiString): String;
+var i: integer;    //JvTimeFrameWork: TJvTimeFrameWork
+begin
+  Setlength(Result, length(s));
+  for I := 1 to length(s) do
+    result[I] := Char(s[i]);
+end;
+
+{************************************************}
+procedure TForm1ButtonPostClick(Sender: TObject);
+Var AHTTPResponseHeader: TALHTTPResponseHeader2;
+    ARawPostDatastream: TStringStream;
+    AMultiPartFormDataFile: TALMultiPartFormDataContent;
+    AMultiPartFormDataFiles: TALMultiPartFormDataContents;
+    aTmpPostDataString: TALStrings;
+    i: Integer;  FWinHttpClient: TalWininetHttpClient2;     //TALWininetHttpClient2
+     MemoPostDataFiles: TMemo; CheckBoxUrlEncodePostData: TCheckBox;
+     FHTTPResponseStream: TStringStream;   MemoContentBody: TMemo;   MemoResponseRawHeader: TMemo;
+begin
+  //MainStatusBar.Panels[0].Text := '';
+  //MainStatusBar.Panels[1].Text := '';
+  //MainStatusBar.Panels[2].Text := '';
+  //initWinHTTPClient;
+  //MemoContentBody.Lines.Clear;
+  //MemoResponseRawHeader.Lines.Clear;
+  AHTTPResponseHeader := TALHTTPResponseHeader2.Create;
+  AMultiPartFormDataFiles := TALMultiPartFormDataContents.Create1(true);
+  aTmpPostDataString := TStringList.Create;
+  try
+    //fHTTPResponseStream.Size := 0;
+    Try
+
+     // aTmpPostDataString.Assign(MemoPostDataStrings.lines);
+     // aTmpPostDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
+
+      For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
+        if MemoPostDataFiles.Lines[i] <> '' then begin
+          AMultiPartFormDataFile:= TALMultiPartFormDataContent.Create;
+          TMemoryStream(AMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[i]);
+          AMultiPartFormDataFile.ContentDisposition:= 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[i])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[i])+'"';
+          AMultiPartFormDataFile.ContentType:= ALGetDefaultMIMEContentTypeFromExt(ExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[i])));
+          AMultiPartFormDataFiles.Add1(AMultiPartFormDataFile);
+        end;
+
+      if (AMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
+        FWinHttpClient.PostMultiPartFormData(
+          'editURL.Text',
+          aTmpPostDataString,
+          AMultiPartFormDataFiles,
+          FHTTPResponseStream,
+          AHTTPResponseHeader, [])
+          // PostMultiPartFormData(URL_APILAY_DETECT, reqfields, Files, rets, 
+            //                             aRespContHeader, []);
+
+      else if (AMultiPartFormDataFiles.Count > 0) then begin
+
+        FWinHttpClient.post1(
+          ('editURL.Text'),
+          AMultiPartFormDataFiles.Items[0].DataStream,
+          FHTTPResponseStream,
+          AHTTPResponseHeader,[]);
+
+      end
+
+      else if aTmpPostDataString.Count > 0 then begin
+        if CheckBoxUrlEncodePostData.Checked then FWinHttpClient.PostURLEncoded(
+                                                    'editURL.Text',
+                                                    aTmpPostDataString,
+                                                    FHTTPResponseStream,
+                                                    AHTTPResponseHeader,
+                                                    //TALNameValueArray.Create(),
+                                                     [],
+                                                    True)
+        else begin
+
+          ARawPostDatastream := TStringStream.create(aTmpPostDataString.text);
+          try
+            FWinHttpClient.post1(
+              '(editURL.Text)',
+              ARawPostDatastream,
+              FHTTPResponseStream,
+              AHTTPResponseHeader,[]);
+
+          finally
+            ARawPostDatastream.free;
+          end;
+        end;
+      end
+
+      else FWinHttpClient.Post(
+             'editURL.Text)',
+             FHTTPResponseStream,
+             AHTTPResponseHeader,[]);
+
+      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+    Except
+      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      Raise;
+    end;
+  finally
+    AHTTPResponseHeader.Free;
+    AMultiPartFormDataFiles.Free;
+    aTmpPostDataString.free;
+  end;
+end;
+
+procedure TForm1_initWinHTTPClient;
+var fMustinitWinHTTPClient: Boolean;
+    FWinHttpClient: TalWinHttpClient; //TalWininetHttpClient2; //TalWinHttpClient;
+    RadioButtonProtocolVersion1_0: TRadioButton;
+    RadioButtonAccessType_NO_PROXY: TRadioButton;
+    RadioButtonAccessType_NAMED_PROXY: TRadioButton;
+    RadioButtonAccessType_DEFAULT_PROXY: TRadioButton;
+    CheckBoxInternetOption_BYPASS_PROXY_CACHE: TCheckBox;
+    CheckBoxInternetOption_ESCAPE_DISABLE: TCheckBox;
+    CheckBoxInternetOption_REFRESH: TCheckBox;
+    CheckBoxInternetOption_SECURE: TCheckBox;
+    CheckBoxInternetOption_ESCAPE_PERCENT: TCheckBox;
+    CheckBoxInternetOption_NULL_CODEPAGE: TCheckBox;
+    CheckBoxInternetOption_ESCAPE_DISABLE_QUERY: TCheckBox;
+    CheckBoxInternetOption_KEEP_CONNECTION: TCheckBox;
+    CheckBoxInternetOption_NO_COOKIES: TCheckBox;
+    CheckBoxInternetOption_NO_AUTO_REDIRECT: TCheckBox;
+Begin
+  if not fMustinitWinHTTPClient then Exit;
+  fMustinitWinHTTPClient := False;
+  With FWinHTTPClient do begin
+    UserName := ('EditUserName.Text');
+    Password := ('EditPassword.Text');
+
+    if AlIsInteger(('EditConnectTimeout.Text')) then 
+                              ConnectTimeout := StrToInt('EditConnectTimeout.Text');
+    if AlIsInteger(('EditsendTimeout.Text')) then SendTimeout := StrToInt('EditSendTimeout.Text');
+    if AlIsInteger(('EditReceiveTimeout.Text')) then ReceiveTimeout := StrToInt('EditReceiveTimeout.Text');
+
+    //if RadioButtonProtocolVersion1_0.Checked then ProtocolVersion := TALHTTPProtocolVersion.v1_0
+    //else ProtocolVersion := TALHTTPProtocolVersion.v1_1;
+
+    if AlIsInteger(('EditBufferUploadSize.Text')) then 
+                       UploadBufferSize := StrToInt('EditBufferUploadSize.Text');
+
+    ProxyParams.ProxyServer := ('EdProxyServer.Text');
+    ProxyParams.ProxyPort := StrToInt('EdProxyPort.Text');
+    ProxyParams.ProxyUserName := ('EdProxyUserName.Text');
+    ProxyParams.ProxyPassword := ('EdProxyPassword.Text');
+    ProxyParams.ProxyBypass := ('EdProxyBypass.Text');
+
+    if RadioButtonAccessType_NO_PROXY.Checked then AccessType := wHttpAt_NO_PROXY
+    else if RadioButtonAccessType_NAMED_PROXY.Checked then AccessType := wHttpAt_NAMED_PROXY
+    else if RadioButtonAccessType_DEFAULT_PROXY.Checked then AccessType := wHttpAt_DEFAULT_PROXY;
+
+    InternetOptions := [];
+    If CheckBoxInternetOption_BYPASS_PROXY_CACHE.checked then InternetOptions := InternetOptions + [wHttpIo_BYPASS_PROXY_CACHE];
+    If CheckBoxInternetOption_ESCAPE_DISABLE.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_DISABLE];
+    If CheckBoxInternetOption_ESCAPE_DISABLE_QUERY.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_DISABLE_QUERY];
+    If CheckBoxInternetOption_ESCAPE_PERCENT.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_PERCENT];
+    If CheckBoxInternetOption_NULL_CODEPAGE.checked then InternetOptions := InternetOptions + [wHttpIo_NULL_CODEPAGE];
+    If CheckBoxInternetOption_REFRESH.checked then InternetOptions := InternetOptions + [wHttpIo_REFRESH];
+    //If CheckBoxInternetOption_SECURE.checked then InternetOptions := InternetOptions + [wHttpIo_SECURE];
+    //If CheckBoxInternetOption_NO_COOKIES.checked then InternetOptions := InternetOptions + [wHttpIo_NO_COOKIES];
+    //If CheckBoxInternetOption_KEEP_CONNECTION.checked then InternetOptions := InternetOptions + [wHttpIo_KEEP_CONNECTION];
+    //If CheckBoxInternetOption_NO_AUTO_REDIRECT.checked then InternetOptions := InternetOptions + [wHttpIo_NO_AUTO_REDIRECT];
+
+    RequestHeader.RawHeaderText := ('MemoRequestRawHeader.Text');
+  end;
+end;
+
+
+function TestWininetWrapGet(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+    LFormData : TidMultipartFormDataStream;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  LFormData := TidMultipartFormDataStream.Create();
+  //Params.AddFormField( 'documentmetadata', 'application/json', 'utf-8', RequestStream);
+    LFormData.AddFormField1('image', '{"id":submitimage}','','utf-8','');
+    LFormData.AddFile('files', exepath+'randimage01.jpg',GetMIMETypeFromFile(exepath+'randimage01.jpg')); 
+    // You can also use AddStream method if it's available
+  
+  rets:= TStringStream.create('');
+  heads:= TStringlist.create;     
+  try 
+    //heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=application/json, text/plain, */*');
+    heads.add('User-Agent= '+SUSERAgent2);
+    iht:= httpq.SetAcceptedLanguages('de,de-DE;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6');
+    iht:= httpq.setHeaders(heads);
+    httpq.Get(AURL, rets);
+    writeln('verify cert: '+botostr(httpq.GetVerifyCert)); 
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       result:= rets.datastring;
+       //rets.savetofile((exepath+'randimage01.jpg'));
+       //openfile(exepath+'randimage01.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+    LFormData.Free;
+  end;                  
+end;                 //}
+
+function TestWininetWrapPost(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    contents, rets: TStringStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+    LFormData : TidMultipartFormDataStream;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  LFormData := TidMultipartFormDataStream.Create();
+  //Params.AddFormField( 'documentmetadata', 'application/json', 'utf-8', RequestStream);
+    LFormData.AddFormField1('image', '{"id":submitimage}','','utf-8','');
+    LFormData.AddFile('files', exepath+'randimage01.jpg',GetMIMETypeFromFile(exepath+'randimage01.jpg')); 
+    // You can also use AddStream method if it's available
+  
+  rets:= TStringStream.create('');
+  contents:= TStringStream.createstring('this we send a post stream steam');
+  heads:= TStringlist.create;     
+  try 
+    //heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=application/json');
+    heads.add('User-Agent= '+SUSERAgent2);
+    iht:= httpq.SetAcceptedLanguages('de,de-DE;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6');
+    iht:= httpq.setHeaders(heads);
+    httpq.Post(AURL, contents, rets);
+    writeln('Verify cert: '+botostr(httpq.GetVerifyCert)); 
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       result:= rets.datastring;
+       writeln('Server: '+Httpq.GetResponseHeader('server'));
+       //rets.savetofile((exepath+'randimage01.jpg'));
+       //openfile(exepath+'randimage01.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+    contents.Free;
+    LFormData.Free;
+  end;                  
+end;                 //}
+
+function TestWininetWrapPostMultiPartData(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+    BodyData : TidMultipartFormDataStream;   //Body: TMultipartFormBody;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  bodyData := TidMultipartFormDataStream.Create();
+  //Params.AddFormField( 'documentmetadata', 'application/json', 'utf-8', RequestStream);
+    bodyData.AddFormField1('image', '{"id":submitimage}','','utf-8','');
+    bodyData.AddFile('files', exepath+'randimage0.jpg',GetMIMETypeFromFile(exepath+'randimage01.jpg')); 
+    // You can also use AddStream method if it's available
+  
+  rets:= TStringStream.create('');
+  heads:= TStringlist.create;     
+  try 
+    //heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=application/json');
+    heads.add('User-Agent= '+SUSERAgent2);
+    iht:= httpq.SetAcceptedLanguages('de,de-DE;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6');
+    iht:= httpq.setHeaders(heads);
+    httpq.Post(AURL, bodydata, rets);
+    writeln('Verify cert: '+botostr(httpq.GetVerifyCert)); 
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       result:= rets.datastring;
+       writeln('Server: '+Httpq.GetResponseHeader('server'));
+       writeln('ContentSize: '+Httpq.GetResponseHeader('content-length'));
+       //rets.savetofile((exepath+'randimage01.jpg'));
+       //openfile(exepath+'randimage01.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+    bodyData.Free;
+  end;                  
+end;                 //}
+
+function TestWininetWrapPostMultiPartFiles(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+    BodyData : TidMultipartFormDataStream;   //Body: TMultipartFormBody;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  bodyData := TidMultipartFormDataStream.Create();
+  //Params.AddFormField( 'documentmetadata', 'application/json', 'utf-8', RequestStream);
+    bodyData.AddFormField1('files', '{"id":submitimage}','','application/octet-stream;base64','');
+    bodyData.AddFile('files', exepath+'randimage0.jpg',GetMIMETypeFromFile(exepath+'randimage01.jpg')); 
+    // You can also use AddStream method if it's available
+  
+  rets:= TStringStream.create('');
+  heads:= TStringlist.create;     
+  try 
+    //heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=application/json');
+    heads.add('User-Agent= '+SUSERAgent2);
+     heads.add('Content-Type= multipart/form-data; boundary=XXXxyxy---------');
+     heads.add('Content-Type=files');
+      heads.add('files=randimage0.jpg');
+     heads.add('Content-Disposition=form-data; name="image"; filename="randimage0.jpg"');
+    iht:= httpq.SetAcceptedLanguages('de,de-DE;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6');
+    iht:= httpq.setHeaders(heads);
+    httpq.Post(AURL, bodydata, rets);
+    writeln('Verify cert: '+botostr(httpq.GetVerifyCert)); 
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       result:= rets.datastring;
+       writeln('Server: '+Httpq.GetResponseHeader('server'));
+       writeln('ContentSize: '+Httpq.GetResponseHeader('content-length'));
+       //rets.savetofile((exepath+'randimage01.jpg'));
+       //openfile(exepath+'randimage01.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+    bodyData.Free;
+  end;                  
+end;                 //}
+
+function TestWininetWrapPostMultiPartFilesAPI(AURL, url_name, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+    BodyData : TidMultipartFormDataStream;   //Body: TMultipartFormBody;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  bodyData := TidMultipartFormDataStream.Create();
+  //Params.AddFormField( 'documentmetadata', 'application/json', 'utf-8', RequestStream);
+    bodyData.AddFormField1('files', '{"id":submitimage}','','application/octet-stream;base64','');
+    bodyData.AddFile('files', exepath+'randimage0.jpg',GetMIMETypeFromFile(exepath+'randimage01.jpg')); 
+    // You can also use AddStream method if it's available
+  
+  rets:= TStringStream.create('');
+  heads:= TStringlist.create;     
+  try 
+    heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=application/json');
+    heads.add('User-Agent= '+SUSERAgent2);
+     heads.add('Content-Type= multipart/form-data');
+     heads.add('Content-Type=files');
+      heads.add('files=randimage0.jpg');
+     heads.add('Content-Disposition=files; name="image"; filename="randimage0.jpg"');
+    iht:= httpq.SetAcceptedLanguages('de,de-DE;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6');
+    iht:= httpq.setHeaders(heads);
+    httpq.Post(AURL, bodydata, rets);
+    writeln('Verify cert: '+botostr(httpq.GetVerifyCert)); 
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       result:= rets.datastring;
+       writeln('Server: '+Httpq.GetResponseHeader('server'));
+       writeln('ContentSize: '+Httpq.GetResponseHeader('content-length'));
+       //rets.savetofile((exepath+'randimage01.jpg'));
+       //openfile(exepath+'randimage01.jpg');
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+    bodyData.Free;
+  end;                  
+end;                 //}
+
+
+procedure TRestOnResponseEvent2(ARestClient: TRestClient; ResponseCode:Integer; 
+                                              const ResponseContent: string);  
+ begin
+   print('@addr:'+objtostr(arestclient));
+   print('response cont: '+responsecontent)
+   print('response code: '+itoa(responsecode));
+   print('enabled compression '+botostr(arestclient.EnabledCompression));
+   print('content-encoding:'+arestclient.responseheader['Content-Encoding']);
+   print('verifycert: '+botostr(arestclient.verifycert)+CRLF+CRLF);
+ end;  
+ 
+ function TRestClient5_AskChatGPT(AURL, askstream: string; aApikey: string;
+                                  aResponseHeader:TRestResponseHandler):string;
+var JPostdat: string;
+    jo: TJSON; rest: TRestResource;   mup: TMultiPartFormAttachment ;
+    mupdat: TMultiPartFormData; //mpb: TMultipartFormBody; 
+begin
+  JPostDat:= '{'+
+    '"model": "text-davinci-003",'+
+    '"prompt": "%s",'+
+    '"max_tokens": 2048,'+
+    '"temperature": 0.15}';
+    
+  with TMultiPartFormAttachment.create do begin
+    content:= TStringStream.createstring(format(JPostDat,[askstream]));
+    free
+   end;   
+
+  with TRestClient.create(self) do begin
+      rest:= Resource(AURL);
+      println('@addr:'+objtostr(rest))
+      rest.ContentType('application/json');
+      rest.header('User-Agent',SUSERAgent);
+      rest.Authorization('Bearer '+AAPIKEY);               
+      ConnectionType:= hctWinInet;
+      OnResponse:= @TRestOnResponseEvent2;
+    try
+      jo:= TJSON.Create(); 
+      jo.parse(rest.Post(TStringStream.createstring(format(JPostDat,[askstream])))); 
+      //result:= jo.values['choices'].asarray[0].asobject['text'].asstring;
+       result:= jo.stringify+CRLF+CRLF;
+    finally
+      Free;
+      jo.Free;
+    except  
+      writeln('EWI_Exc:'+ExceptiontoString(exceptiontype,exceptionparam));
+    end; 
+  end; //with   
+end; 
+
+  
+ function TRestClient5_ObjectDetectAPI(AURL, askstream: string; aApikey: string;
+                                  aResponseHeader:TRestResponseHandler):string;
+var JPostdat: string;
+    jo: TJSON; rest: TRestResource;   mup: TMultiPartFormAttachment ;
+    mupdat: TMultiPartFormData; //mpb: TMultipartFormBody; 
+    files: TStringStream;  tempm: TMemoryStream;
+begin
+  JPostDat:= '{'+
+    '"model": "text-davinci-003",'+
+    '"prompt": "%s",'+
+    '"max_tokens": 2048,'+
+    '"temperature": 0.15}';
+    
+  with TMultiPartFormAttachment.create do begin
+    content:= TStringStream.createstring(format(JPostDat,[askstream]));
+    free
+   end;   
+   
+   tempm:= TMemoryStream.create;
+    files:= TStringStream.create('');
+    files.loadfromfile(exepath+'randimage0.jpg');
+    files.savetostream(tempm)
+    //tempm.savetofile(exepath+'randimage0cop1.jpg');
+    //openfile(exepath+'randimage0cop1.jpg');
+    
+    writeln(GetMIMETypeFromFile(exepath+'randimage0.jpg'));
+    
+    mup:= TMultiPartFormAttachment.create1('application/octet-stream','randimage0.jpg');
+    mup.content:= files;
+    mup.mimetype:= GetMIMETypeFromFile(exepath+'randimage0.jpg');
+    mup.filename:= 'randimage0.jpg';
+    writeln('file size '+itoa(mup.content.size));
+    mup.content.savetofile(exepath+'randimage0cop.jpg')
+    //openfile(exepath+'randimage0cop.jpg');
+
+  with TRestClient.create(self) do begin
+      rest:= Resource(AURL);
+      println('@addr:'+objtostr(rest))
+      rest.ContentType('application/json');
+      rest.header('User-Agent',SUSERAgent);
+      rest.header('X-Api-Key',AAPIKEY);
+      //rest.Authorization('X-Api-Key'+AAPIKEY);               
+      ConnectionType:= hctWinInet;
+      OnResponse:= @TRestOnResponseEvent2;
+      //rpos5
+    try
+      jo:= TJSON.Create(); 
+      //jo.parse(rest.Post(TStringStream.createstring(format(JPostDat,[askstream])))); 
+       //(rest.Postmultipart((mup)));
+        jo.parse(rest.post(mup.content));
+      //result:= jo.values['choices'].asarray[0].asobject['text'].asstring;
+       result:= jo.stringify+CRLF+CRLF;
+    finally
+      Free;
+      jo.Free;
+      files.free;
+      if assigned(mup) then
+        mup.free;
+        tempm.free;
+    except  
+      writeln('EWI_Exc:'+ExceptiontoString(exceptiontype,exceptionparam));
+    end; 
+  end; //with   
+end; 
+
+
+procedure TestHTTPClassComponent;
+var HttpRequest1: THttpRequestC;
+    Body: TMultipartFormBody;
+    Body2: TUrlEncodedFormBody;
+begin
+  Body2 := TUrlEncodedFormBody.Create;
+  Body2.ReleaseAfterSend := True;
+  Body2.Add('code', '1');
+  Body2.Add('name', 'John');
+  Body := TMultipartFormBody.Create;
+  Body.ReleaseAfterSend := True;
+  Body.Add('code', '2', 'application/octet-stream');
+  Body.AddFromFile('image', exepath+'randimage0cop.jpg');
+  HttpRequest1:= THttpRequestC.create(self);
+   //if HttpRequest1.Get('https://httpbin.org/get') then
+   //if HttpRequest1.Post2('https://httpbin.org/post', 'testing a POST') then 
+    //if HttpRequest1.Post1('https://httpbin.org/post', body) then 
+    if HttpRequest1.Post1Multipart('https://httpbin.org/post', body) then 
+    writeln(HttpRequest1.Response.ContentAsString)
+   
+  else
+    Writeln('ERROR ' + inttostr(HttpRequest1.Response.StatusCode2));
+     writeln('status2: '+itoa(HttpRequest1.Response.statuscode2))
+     writeln('status3: '+gethttpcod(HttpRequest1.Response.statuscode2))
+  HttpRequest1.Free;  
+  //if assigned(body) then body.free;
+  body2.free;
+end;
+
+function TestHTTPClassComponentAPIDetection(AURL, askstream: string; aApikey: string): string;
+var HttpRequest1: THttpRequestC;
+    Body: TMultipartFormBody;
+    Body2: TUrlEncodedFormBody;
+begin
+  {Body2 := TUrlEncodedFormBody.Create;
+  Body2.ReleaseAfterSend := True;
+  Body2.Add('code', '1');
+  Body2.Add('name', 'John');   }
+  Body:= TMultipartFormBody.Create;
+  Body.ReleaseAfterSend:= True;
+  Body.Add('code', '2', 'application/octet-stream');
+  Body.AddFromFile('image', exepath+'randimage0cop.jpg');
+  HttpRequest1:= THttpRequestC.create(self);
+  HttpRequest1.headers.add('X-Api-Key:'+AAPIKEY);
+  HttpRequest1.headers.add('Accept:application/json');
+   //if HttpRequest1.Get('https://httpbin.org/get') then
+   //if HttpRequest1.Post2('https://httpbin.org/post', 'testing a POST') then 
+    //if HttpRequest1.Post1('https://httpbin.org/post', body) then 
+    if HttpRequest1.Post1Multipart(AURL, body) then 
+       writeln(HttpRequest1.Response.ContentAsString)
+   
+  else
+    Writeln('ERROR ' + inttostr(HttpRequest1.Response.StatusCode2));
+     writeln('status2: '+itoa(HttpRequest1.Response.statuscode2))
+     writeln('status3: '+gethttpcod(HttpRequest1.Response.statuscode2))
+    //   if assigned(body) then body.free;
+  HttpRequest1.Free;  
+  sleep(500)
+    //if assigned(body) then body.free;
+  //body2.free;
+end;
+
+var backstr, validtext: string;  IdDecoderMIME: TIdDecoderMIME;
+
+Begin //@main
+  //FilelessWB('https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg');
+  //FilelessWB2('https://th.bing.com/th/id/OIP.jFT3xuBUKNYqqS2ZoSGbsgHaEK?w=289&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7');
+  //FilelessWB2PNG('https://www.pngrepo.com/png/429486/60/digger-excavator-shovel.png');
+  //FilelessWB2PNG('https://wiki.gnome.org/Apps/EyeOfGnome?action=AttachFile&do=get&target=screenshot.png');
+  
+        
+ { backstr:= (parseJsonvalue(GEO_to_text_API2_emoji(URL_APILAY_EMO, 'slightly smiling face', 
+                                          N_APIKEY)));
+                                   
+   validtext:= StringReplace( backstr, '\n', CR+LF,[rfReplaceAll]); 
+   
+   writeln(validtext);    //}
+   writeln(#$d83d#$de42);       
+   
+  //writeln(GEO_to_text_API2_randimage3(URL_APILAY_IMG, 'nature',  N_APIKEY));
+    // } 
+    
+   
+    //writeln(textsimilarity_API6(URL_APILAY_TEXTSIM,'',N_APIKEY));
+    //StringReplace( backstr, '\n', CR+LF,[rfReplaceAll]); 
+    
+    { 
+    writeln(StringReplace(Facts_API25(URL_APILAY_FACTS2, '2',N_APIKEY),
+                                           '{"', CR+LF, [rfReplaceAll]));
+      //}
+    
+  //  writeln(ObjectDetect_API7(URL_APILAY_DETECT, '',N_APIKEY));
+    
+  //writeln(GEO_to_text_API2_randimage2_Detect(URL_APILAY_DETECT, '',
+    //                                N_APIKEY));  
+                                   
+  //http%3A%2F%2Fwww.kleiner.ch%2Fkleiner%2Fimages%2Fuml_buch.jpg"
+  //Pycode(URLIMAGEPATH);  
+   sleep(1000)
+    setdebugcheck(true);
+    //mainmultiparttest
+    
+    //writeln(TALHTTPClient_Detect_multipart('', N_APIKEY, nil, nil));
+    //}
+    
+  // writeln(GEO_to_ImageDetect_MPart(URL_APILAY_DETECT, 'url_name', N_APIKEY));
+    
+    //testmultipartformdata;
+   // testmultipartformdata2('gwM+25ePKBKfgnz40Q+s+w==sFarUVYdUdmV9___');
+   //membase64Test2();  
+   
+  // writeln('out: '+replaceregexpr('<.*?>','that''s a <b>text test</b> with <i>HTML</i>signs',
+     //                                           '',true));    
+   //StrReplaceRegEx('that''s a <b>text test</b> with <i>HTML</i>signs','<.*?>',['th is']);   
+   
+  //aResponseContentHeader:TALHTTPResponseHeader2 
+  //https://synopse.info/forum/viewtopic.php?id=262
+  //https://stackoverflow.com/questions/5405827/thttpapiserver-sample
+   with THttpApiServer.create (true, '', nil, nil, 'apiproc') do begin
+     writeln(botostr(hasapi2));
+     //AddUrlAuthorize('root','888',false,'+',delete));
+     free
+   end; 
+   
+   //indy10test(TESTURL2);
+   //writeln(synGetRemoteMacAddress('192.168.56.1'));  
+   
+   //https://httpbin.org/get
+   //writeln(TestWininetWrapGet('https://httpbin.org/get?file=maxarg', 'url_name', 'aApikey: string'));
+   //writeln(TestWininetWrappost('https://httpbin.org/post', 'url_name', 'aApikey: string'));
+  // writeln(TestWininetWrappostMultiPartData('https://httpbin.org/post', 'url_name', 'aApikey: string'));
+  
+   //writeln(TestWininetWrappostMultiPartFiles('https://httpbin.org/post','url_name','aApikey: string'));
+   //writ(TestWininetWrapPostMultiPartFilesAPI(URL_APILAY_DETECT,'url_name', N_APIKEY));
+
+  // writ(TRestClient5_AskChatGPT('https://httpbin.org/post', 'askstream: string;', N_APIKEY,  nil));
+
+  // writ(TRestClient5_ObjectDetectAPI(URL_APILAY_DETECT, 'askstream: string;', N_APIKEY, nil));
+     
+     //TestHTTPClassComponent();
+     println(TestHTTPClassComponentAPIDetection(URL_APILAY_DETECT,' askstream',N_APIKEY));
+        
+          writ(itoa(getbitcount(0123456789)));
+          writ(itoa(popcount64(0123456789)));
+           writ(itoa(popcount32(0123456789)));
+                                                                                   
+   // println(PyCodeObjectDetect2('./randimage01bee.jpg', N_APIKEY));    
+   
+   //writ(list_modules(exepath+'maxbox5_14beta80.exe'));   
+     //BuildStrHTTPVersion
+   //SelfTestcHTTPUtils();                                            
+   
+End.
+
+Ref: http://www.rolandmuseum.de/syn_ana.php
+https://www.coderstool.com/unicode-text-converter
+
+fact": "In 1631, two London bible printers accidentally left the word \"not\" out of the seventh commandment, which then read, \"Thou shalt commit adultery.\" 
+This legendary book is now known as the \"Wicked Bible.\""}]
+file size 36323
+
+[{"code":"U+1F642","character":"Ã°Å¸â„¢â€š","image":
+"https:\/\/api-ninjas-data.s3.us-west-2.amazonaws.com\/emojis\/U%2B1F642.png",
+"name":"slightly smiling face","group":"smileys_emotion","subgroup":"face_smiling"}]
+
+ {
+    "code": "U+1F642",
+    "character": "🙂",
+    "image": "https://api-ninjas-data.s3.us-west-2.amazonaws.com/emojis/U%2B1F642.png",
+    "name": "slightly smiling face",
+    "group": "smileys_emotion",
+    "subgroup": "face_smiling"
+  },
+
+Ã«Â¿Â¯Ã®ÂºÂ½Ã«Â¾Æ’Ã¨Æ’Â¡Ã®â€™â‚¬Ã¨Âªâ„¢Ã©Â§Â¤Ã¬â€™â€°Ã†â‚¬Ã¨Æ’â€žÃ¨Æ’â€žÃ®Â¼â‚¬Ã«Â¶Â¿Ã¨Â³Â¤Ã®â€šâ‚¬Ã¨â€šÂ Ã¨â€ºËœÃ¨Å¸ËœÃªÆ’Â Ã¯Â¿Â½Ã®â€šâ€¡Ã¨Å¾Â¤ÃªÆ’Â Ã®â€šâ€°Ã¨ÂªÂ°Ã«â€œÂ Ã®â€šâ€Ã¨Â²Â¬Ã
+«Æ’Â Ã®â€ â€¹Ã©Â¦Ë†Ã«Â³Â Ã®â€ â€œÃ©â€™Â´Ã«Â³Â¡Ã®â€ Å¡Ã©ÂºÂ´Ã«Æ’Â¡Ã®Å Å¡Ã©Â²â‚¬Ã«Â£Â¢Ã®Å Â¤ÃªÅ¾â‚¬Ã«Æ’Â¢Ã®â€ Â¢ÃªÅ½Â°ÃªÆ’Â¢Ã®Å Å“Ã«Å¾Â¤Ã¨Æ’Â£Ã®Å½Â¬Ã«â€ ÂÃ©Æ’Â£Ã®Å Â´Ã©Â¾Å“Ã«â€œÂ£Ã®Å½Â¹
+Ã«Â¢Ë†Ã«Â£Â¢Ã®Å½Â¼Ã«Å½ÂÃ«Â³Â¯Ã¬Å½Â²Ã¬â€“â€ºÃ®â€šÆ’Ã¨Â¦Â¤Ã«Æ’Â Ã®â€šâ€°Ã¨Â®Â°Ã«â€œÂ Ã®â€ ËœÃ¨Â¶Â Ã¨â€œÂ¢Ã®Å Â²Ã©Â²â€žÃ¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å 
+Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²
+Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Å½Â²Ã«Å Ë†Ã¨Â£Â£Ã®Â²Â²Ã«Â¾Æ’Ã¨â€œÂ¡Ã¬â€™â‚¬Ã¬Â®Ë†Ã¬ÂºÂ Ã®Å â‚¬Ã¨â€ Ë†Ã¨Æ’Ë†Ã©â€¡
+â€žÃ¨â€œÂ¡Ã®Â¾Æ’Ã¨â€ Â¼Ã¨â€œÆ’Ã¬ÂÅ¸Ã¬â€™â‚¬Ã¬â€™â€¦Ã¬â€™ÂÃ†Â
+ mX5Ã°Å¸ÂÅ¾ executed: 12/04/2024 10:25:19  Runtime: 0:0:4.476  Memload: 68% use
+
+debug: 68-Can not send REST message https://api.api-ninjas.com/v1/textsimilarity/, error: Bad Gateway (502) 850 err:20
+EWI_HTTP: Exception: Can not send REST message https://api.api-ninjas.com/v1/textsimilarity/, error: Bad Gateway (502)
+
+    
+  In this code snippet:
+    
+    {
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "application/json",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "de,de-DE;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+    "Content-Length": "0",
+    "Host": "httpbin.org",
+    "Origin": "https://httpbin.org",
+    "Referer": "https://httpbin.org/",
+    "Sec-Ch-Ua": "\"Microsoft Edge\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": "\"Windows\"",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0",
+    "X-Amzn-Trace-Id": "Root=1-6629138a-30ccdbda63321bda3a813217"
+  },
+  "json": null,
+  "origin": "46.127.119.188",
+  "url": "https://httpbin.org/post"
+}
+Response headers
+
+Replace https://connect.aerius.nl/api/v7/receptorSets with your actual API endpoint.
+Adjust the cFileName variable to point to the correct file path.
+Ensure that the api-key header is set appropriately.
+Additionally, note that the ContentType and ContentTransfer properties need to be set 
+for each form field. You can set them explicitly as shown below:
+
+debug size: 10146
+[{"name":"France","alpha2code":"FR","alpha3code":"FRA","capital":"Paris","alt_spellings":["FR","French Republic","RÃƒÂ©publique franÃƒÂ§aise"],
+"region":"Europe","subregion":"Western Europe","population":66710000,"latitude":46.0,"longitude":2.0,"demonym":"French","area":640679.0,
+"gini":32.7,"timezones":["UTC-10:00","UTC-09:30","UTC-09:00","UTC-08:00","UTC-04:00","UTC-03:00","UTC+01:00","UTC+03:00","UTC+04:00","UTC+05:00",
+"UTC+11:00","UTC+12:00"],"borders":["AND","BEL","DEU","ITA","LUX","MCO","ESP","CHE"],"native_name":"France","numeric_code":"250",
+"flag":"http:\/\/assets.promptapi.com\/flags\/FR.svg","top_level_domains":[".fr"],"calling_codes":["33"],"currencies":[{"name":"Euro","code":"EUR","symbol":"Ã¢â€šÂ¬"}],
+"languages":[{"name":"French","native_name":"franÃƒÂ§ais","iso639_1":"fr","iso639_2":"fra"}],"regional_blocs":[{"acronym":"EU","name":"European Union"}]}]
+ mX5?? executed: 08/04/2024 18:20:53  Runtime: 0:0:33.394  Memload: 63% use
+RemObjects Pascal Script. Copyright (c) 2004-2024 by RemObjects Software & maXbox5
+Ver: 5.1.4.90 (514). Workdir: C:\maxbox\ipso\IBZ_Module1_4_2022\maxbox4Aarau\maxbox5\maxbox5
+
+Ã¢â‚¬Å“I knew from the start that I was bound to be crucified either way I moved. If I left the woman I really loved Ã¢â‚¬â€ the Great Society Ã¢â‚¬â€ 
+in order to get involved in that bitch of a war on the other side of the world, then I would 
+lose everything at home. All my programs. Ã¢â‚¬Â¦ But if I left that war and let the Communists 
+take over South Vietnam, then I would be seen as a coward and my nation would be seen as 
+an appeaser and we would both find it impossible to accomplish anything for anybody 
+anywhere on the entire globe.Ã¢â‚¬Â
+
+Ver: 5.1.4.90 (514). Workdir: C:\maxbox\ipso\IBZ_Module1_4_2022\maxbox4Aarau\maxbox5\maxbox5
+EWI_HTTP: Exception: Can not send REST message https://api.apilayer.com/geo/country/capital/Vienna, error:  (524)
+Exception: Access violation at address 00000000019D9080 in module 'maXbox5.exe'. Read of address 0000000000000000 at 0.298
+
+Doc: The fact that error code is not "one of the expected return values" tells for the versions that the error comes from an underlying layer and this 
+API just passes it up on internal failure. As a clue, having disabled some network adapter on the system, you might get rid of the error.
+
+ mX5?? executed: 08/04/2024 15:57:23  Runtime: 0:0:3.538  Memload: 62% use
+RemObjects Pascal Script. Copyright (c) 2004-2024 by RemObjects Software & maXbox5
+Ver: 5.1.4.90 (514). Workdir: C:\maxbox\ipso\IBZ_Module1_4_2022\maxbox4Aarau\maxbox5\maxbox5
+----app_template_loaded_code----
+----File newtemplate.txt not exists - now saved!----
+
+https://medium.com/@abhay.anand/day-3-linux-commands-you-should-know-65fb849561cc
+https://medium.com/100-days-of-linux/7-fundamental-use-cases-of-netcat-866364eb1742
+https://medium.com/@saravra/how-to-study-cybersecurity-64ee0478e87e
+
+New in maXbox 5.1.4.95 (April 19, 2024)
+New in maXbox 5.1.4.90 (March 21, 2024)
+New in maXbox 4.7.6.50 (June 15, 2023)
+New in maXbox 4.7.6.20 (December 15, 2022)
+New in maXbox 4.7.6.10 (November 12, 2021)
+New in maXbox 4.7.5.80 (July 22, 2021)
+New in maXbox 4.7.4.64 (June 14, 2020)
+New in maXbox 4.7.4.62 (June 8, 2020)
+New in maXbox 4.7.4.60 (April 21, 2020)
+New in maXbox 4.7.3.60 (April 15, 2020)
+New in maXbox 4.7.2.82 (April 7, 2020)
+New in maXbox 4.7.1 (November 15, 2019)
+New in maXbox 4.6.3.10 (August 6, 2019)
+New in maXbox 4.5.8.10 (December 27, 2017)
+New in maXbox 4.2.8.10 (October 24, 2017)
+New in maXbox 4.2.6.10 (August 24, 2017)
+New in maXbox 4.2.5.10 (February 20, 2017)
+New in maXbox 4.2.4.80 (October 21, 2016)
+New in maXbox 4.2.4.60 (September 30, 2016)
+New in maXbox 4.2.4.25 (June 8, 2016)
+New in maXbox 4.2.2.90 (April 25, 2016)
+New in maXbox 4.2.0.80 (April 15, 2016)
+New in maXbox 4.0.2.60 (February 2, 2016)
+New in maXbox 3.9.9.195 (May 19, 2015)
+New in maXbox 3.9.9.190 (March 20, 2015)
+New in maXbox 3.9.9.180 (February 12, 2015)
+New in maXbox 3.9.9.160 (January 14, 2015)
+New in maXbox 3.9.9.120 (November 29, 2014)
+New in maXbox 3.9.9.110 (November 12, 2014)
+New in maXbox 3.9.9.101 (October 25, 2014)
+New in maXbox 3.9.9.100 (October 10, 2014)
+New in maXbox 3.9.9.98 (July 25, 2014)
+New in maXbox 3.9.9.96 (May 15, 2014)
+New in maXbox 3.9.9.95 (April 24, 2014)
+New in maXbox 3.9.9.94 (March 28, 2014)
+New in maXbox 3.9.9.92 (March 20, 2014)
+New in maXbox 3.9.9.91 (March 12, 2014)
+New in maXbox 3.9.9.88 (February 10, 2014)
+New in maXbox 3.9.9.86 (January 27, 2014)
+New in maXbox 3.9.9.85 (January 15, 2014)
+New in maXbox 3.9.9.84 (January 6, 2014)
+New in maXbox 3.9.9.82 (December 16, 2013)
+New in maXbox 3.9.9.81 (December 3, 2013)
+New in maXbox 3.9.9.80 (November 11, 2013)
+New in maXbox 3.9.9.60 (October 21, 2013)
+New in maXbox 3.9.9.20 (October 9, 2013)
+New in maXbox 3.9.9.18 (September 30, 2013)
+New in maXbox 3.9.9.16 (September 17, 2013)
+New in maXbox 3.9.9.8 (September 13, 2013)
+New in maXbox 3.9.9.7 (August 27, 2013)
+New in maXbox 3.9.9.6 (August 7, 2013)
+New in maXbox 3.9.9.5 (July 24, 2013)
+New in maXbox 3.9.9.1 (June 24, 2013)
+New in maXbox 3.9.8.9 (June 10, 2013)
+New in maXbox 3.9.8.8 (May 13, 2013)
+New in maXbox 3.9.8.6 (April 10, 2013)
+New in maXbox 3.9.8.3 (March 18, 2013)
+New in maXbox 3.9.8 (February 28, 2013)
+New in maXbox 3.9.7.4 (January 22, 2013)
+New in maXbox 3.9.7.1 (January 22, 2013)
+New in maXbox 3.9.7 (December 3, 2012)
+New in maXbox 3.9.6.3 (November 14, 2012)
+New in maXbox 3.9.4.4 (October 16, 2012)
+New in maXbox 3.9.3.5 (September 26, 2012)
+New in maXbox 3.9.2 (August 31, 2012)
+New in maXbox 3.9.1 (June 14, 2012)
+New in maXbox 3.9.0 (May 23, 2012)
+New in maXbox 3.8.6.4 (May 11, 2012)
+New in maXbox 3.8.6 (April 20, 2012)
+New in maXbox 3.8.5 (April 3, 2012)
+New in maXbox 3.8.4 (March 2, 2012)
+New in maXbox 3.8.2 (January 20, 2012)
+New in maXbox 3.8.1 (January 3, 2012)
+New in maXbox 3.8.0.9 (December 20, 2011)
+New in maXbox 3.7.1 (December 6, 2011)
+New in maXbox 3.7.0.2 (November 9, 2011)
+New in maXbox 3.6.3.0 (November 3, 2011)
+New in maXbox 3.6.2.0 (October 22, 2011)
+New in maXbox 3.6.1.2 (October 12, 2011)
+New in maXbox 3.6.0.2 (October 3, 2011)
+New in maXbox 3.5.0.6 (September 1, 2011)
+New in maXbox 3.3.0.4 (June 27, 2011)
+New in maXbox 3.2.0 (March 25, 2011)
+New in maXbox 3.1.0 (February 24, 2011)
+New in maXbox 3.0.0 (December 20, 2010)
+New in maXbox 2.9.2 (July 23, 2010)
+New in maXbox 2.9 (June 3, 2010)
+
+
+Zeus64 commented on 18 May 2020
+
+C:\Users\Public\Documents\Embarcadero\Studio\21.0\Samples\Object Pascal\VCL\InetWinSockets
+
+64bit build
+
+procedure TDynamicDll.DoOpenDll(const aDllName : string);
+{$IFDEF MSWINDOWS}
+const
+  LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR = $00000100;
+  LOAD_LIBRARY_DEFAULT_DIRS = $00001000;
+Var
+  ExceptMask: TFPUExceptionMask;
+{$ENDIF}
+begin
+  if not IsHandleValid then
+  begin
+    FDllName := aDllName;
+    {$IFDEF MSWINDOWS}
+    ExceptMask := GetExceptionMask;
+    try
+      {$IFDEF FPC}
+      FDLLHandle := LoadLibraryExA(PAnsiChar(AnsiString(GetDllPath+DllName)),
+      {$ELSE}
+      /// [dcc64 Error] PythonEngine.pas(2965): E2010 Incompatible types: 'PWideChar' and 'PAnsiChar'
+      FDLLHandle := LoadLibraryEx(PWidechar(GetDllPath+DllName),
+      {$ENDIF}
+        0, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR or LOAD_LIBRARY_DEFAULT_DIRS);
+    finally
+      SetExceptionMask(ExceptMask);
+    end;
+    {$ELSE}
+    //Linux: need here RTLD_GLOBAL, so Python can do "import ctypes"
+    FDLLHandle := THandle(dlopen(PAnsiChar(AnsiString(GetDllPath+DllName)),
+      RTLD_LAZY+RTLD_GLOBAL));
+    {$ENDIF}
+  end;
+end;
+
+function TMethodsContainer.AddMethod( AMethodName  : PAnsiChar;
+                                      AMethod  : PyCFunction;
+                                      ADocString : PAnsiChar ) : PPyMethodDef;
+begin
+  if FMethodCount = FAllocatedMethodCount then
+    ReallocMethods;
+  Result := Methods[ MethodCount ];
+  Result^.ml_name  := AMethodName;
+  Result^.ml_meth  := AMethod;
+  Result^.ml_flags := METH_VARARGS;
+  Result^.ml_doc   := ADocString;
+  Inc( FMethodCount );
+end;
+
+
+from delphi_module import svg_image
+from io import StringIO
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import  BayesianRidge
+from sklearn.model_selection import RandomizedSearchCV, train_test_split
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.utils import parallel_backend
+parallel_backend('threading')
+import datetime
+import warnings
+warnings.filterwarnings("ignore")
+
+confirmed_df = pd.read_csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
+
+parallel_backend('threading')
+
+cols = confirmed_df.keys()
+confirmed = confirmed_df.loc[:, cols[4]:cols[-1]]
+dates = confirmed.keys()
+world_cases = []
+
+for i in dates:
+    confirmed_sum = confirmed[i].sum()
+    world_cases.append(confirmed_sum)
+
+# window size
+window = 7
+
+days_since_1_22 = np.array([i for i in range(len(dates))]).reshape(-1, 1)
+world_cases = np.array(world_cases).reshape(-1, 1)
+
+days_in_future = 10
+future_forcast = np.array([i for i in range(len(dates)+days_in_future)]).reshape(-1, 1)
+
+start = '1/22/2020'
+start_date = datetime.datetime.strptime(start, '%m/%d/%Y')
+future_forcast_dates = []
+for i in range(len(future_forcast)):
+    future_forcast_dates.append((start_date + datetime.timedelta(days=i)).strftime('%m/%d/%Y'))
+
+X_train_confirmed, X_test_confirmed, y_train_confirmed, y_test_confirmed = train_test_split(days_since_1_22[50:], world_cases[50:], test_size=0.05, shuffle=False)
+
+# transform our data for polynomial regression
+bayesian_poly = PolynomialFeatures(degree=5)
+bayesian_poly_X_train_confirmed = bayesian_poly.fit_transform(X_train_confirmed)
+bayesian_poly_X_test_confirmed = bayesian_poly.fit_transform(X_test_confirmed)
+bayesian_poly_future_forcast = bayesian_poly.fit_transform(future_forcast)
+
+# bayesian ridge polynomial regression
+tol = [1e-6, 1e-5, 1e-4, 1e-3, 1e-2]
+alpha_1 = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
+alpha_2 = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
+lambda_1 = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
+lambda_2 = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
+normalize = [True, False]
+
+bayesian_grid = {'tol': tol, 'alpha_1': alpha_1, 'alpha_2' : alpha_2, 'lambda_1': lambda_1, 'lambda_2' : lambda_2,
+                 'normalize' : normalize}
+
+bayesian = BayesianRidge(fit_intercept=True)
+bayesian_search = RandomizedSearchCV(bayesian, bayesian_grid, scoring='neg_mean_squared_error', cv=3, return_train_score=True, n_jobs=-1, n_iter=40, verbose=1)
+bayesian_search.fit(bayesian_poly_X_train_confirmed, y_train_confirmed)
+
+print(bayesian_search.best_params_)
+
+bayesian_confirmed = bayesian_search.best_estimator_
+test_bayesian_pred = bayesian_confirmed.predict(bayesian_poly_X_test_confirmed)
+bayesian_pred = bayesian_confirmed.predict(bayesian_poly_future_forcast)
+print('MAE:', mean_absolute_error(test_bayesian_pred, y_test_confirmed))
+print('MSE:',mean_squared_error(test_bayesian_pred, y_test_confirmed))
+
+plt.plot(y_test_confirmed)
+plt.plot(test_bayesian_pred)
+plt.legend(['Test Data', 'Bayesian Ridge Polynomial Predictions'])
+
+figfile = StringIO()
+plt.savefig(figfile, format='svg')
+figdata_svg = figfile.getvalue()
+svg_image.SvgText = figdata_svg
+
+#plt.show()
+
+C:\Program Files\Streaming\maxbox4>git clone https://github.com/Embarcadero/python4delphi
+Cloning into 'python4delphi'...
+remote: Enumerating objects: 7345, done.
+remote: Counting objects: 100% (286/286), done.
+remote: Compressing objects: 100% (125/125), done.
+remote: Total 7345 (delta 169), reused 268 (delta 161), pack-reused 7059
+Receiving objects: 100% (7345/7345), 196.71 MiB | 20.92 MiB/s, done.
+
+Resolving deltas: 100% (4968/4968), done.
+Updating files: 100% (469/469), done.
+
+C:\Program Files\Streaming\maxbox4>
+C:\Program Files\Streaming\maxbox4>git clone https://github.com/pyscripter/MultiInstaller
+Cloning into 'MultiInstaller'...
+remote: Enumerating objects: 47, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (11/11), done.
+remote: Total 47 (delta 1), reused 3 (delta 0), pack-reused 36
+Receiving objects: 100% (47/47), 3.21 MiB | 8.90 MiB/s, done.
+Resolving deltas: 100% (12/12), done.
+
+C:\Program Files\Streaming\maxbox4>
+
+C:\Program Files\Streaming\maxbox4>git clone https://github.com/project-jedi/jcl
+Cloning into 'jcl'...
+remote: Enumerating objects: 83063, done.
+remote: Counting objects: 100% (448/448), done.
+remote: Compressing objects: 100% (178/178), done.
+remote: Total 83063 (delta 303), reused 383 (delta 266), pack-reused 82615
+Receiving objects: 100% (83063/83063), 80.63 MiB | 26.36 MiB/s, done.
+Resolving deltas: 100% (65805/65805), done.
+Updating files: 100% (3631/3631), done.
+
+C:\Program Files\Streaming\maxbox4>git clone https://github.com/project-jedi/jvcl
+Cloning into 'jvcl'...
+remote: Enumerating objects: 192049, done.
+remote: Counting objects: 100% (761/761), done.
+remote: Compressing objects: 100% (240/240), done.
+remote: Total 192049 (delta 527), reused 729 (delta 510), pack-reused 191288
+Receiving objects: 100% (192049/192049), 85.74 MiB | 1.27 MiB/s, done.
+Resolving deltas: 100% (148220/148220), done.
+Updating files: 100% (21894/21894), done.
+
+C:\Program Files\Streaming\maxbox4>
+
+Malware die eine  fixe Signatur haben sind meist sehr einfach zu beheben, weshalb statische Analysen eine hÃƒÂ¶here Fix-Rate (28 Prozent) aufweisen, $
+als dynamische Analysen. Nicht jedes der beiden Verfahren
+ eignet sich fÃƒÂ¼r bestimmte Schwachstellen. Beide Bewertungstechniken unterscheiden sich grundlegend und weisen dadurch unterschiedliche PrÃƒÂ¤valenzen aus.
+Ich hÃƒÂ¤tte eine Unterscheidung in statische und dynamische Analyse / Monitoring gemacht.
+
+Generating a PDF via VLCCanvas and TPdfDocumentGDI causes access violation when compiled with Delphi 10.4.1 with record field alignment compiler option 
+set to "byte" or "off". When this option is set to either of "word", "double word" or "quad word", the PDF gets created without errors. The same exact 
+code works fine when compiled with Delphi 10.4 (patch 3), regardless of the field alignment flag.
+It smells like an off-by-one error somewhere (that's why introducing gaps between record fields circumvents it), but I wasn't able to pinpoint it. 
+The exception appears in TPdfWrite.Save method, where the L variable seems to be assigned a meaningless value (zero or negative). 
+But since there's a lot of pointer math and memory copying, the actual cause might as well be completely elsewhere.
+
+<iframe src="data:application/pdf;base64,YOUR_BINARY_DATA" height="100%" width="100%"></iframe>
+----Simple Browser started----
+
+
+TEE Modell News 2024  ☮ ✞ π 📌    â˜® âœž Ï€ ðŸ“Œ
+
+Aktuell in den Handel gekommen ist ja im 2023 schon das Modell der PIKO Re 4/4 I 10034. Es zeigt die AusfÃƒÂ¼hrung so wie sie ab 
+1973 in den Betrieb kam, also mit dem neuen SBB-Logo in Form einer Frontplatte, die breitere Wippe und den vier Einschnitten 
+im Stromabnehmersockel fÃƒÂ¼r den Verkehr nach Lindau (DB/Ãƒâ€“BB Wipe).
+Nun kommt neu auch die 10033 von Piko in den Handel. Das Modell, als Winterneuheiten 2024/25 deklariert, ÃƒÂ¼berzeugt durch gelungenen Formenbau, 
+feingliedrige Pantographen aus Metall, einen vorbildgerechten Dachgarten und zahlreiche angesetzte Details.
+
+Foto Quelle: Piko
+-teetime2_re44_10033_48024_96889.jpg
+-teetime2_re44_10033_48024_96889_2.jpg
+
+Interessant zu wissen ist, dass die Re 4/4 I 10033 2.Serie die letzte in der TEE Lackierung war. Es waren
+ja die vier Lok Nr. 10033, 10034, 10046 und 10050 mit rot/beigen Anstrich.
+Zudem kommt fÃƒÂ¼r den Schweizer Fachhandel die grÃƒÂ¼ne SBB Re 4/4 I 10040 
+mit kleinen TEE-Logos an den Fronten (DC 96886, DC digital Sound 96887, AC digital Sound 96888) in den Handel. Das
+Modell hat ÃƒÂ¼brigens fahrtrichtungsabhÃƒÂ¤ngiger Lichtwechsel 3x weiss vorne und 1x weiss hinten.
+Mittlerweile ist es schon erstaunlich und beachtenswert, was PIKO an Modellen nach Schweizer Vorbildern anbietet.
+Wobei fÃƒÂ¼r viele Deutsche oder Franzosen ÃƒÂ¤rgerlich ist, das wieder einmal Schweiz exklusiv ist.
+
+Als Referenz zur Re 4/4 I liste ich kurz die MÃƒÂ¤rklins auf.
+Die mir somit bekannten, neueren Re 4/4 I MÃƒÂ¤rklin Loks (mit C Sinus Kompaktmotor ) sind folgende Loks:
+
+-  Lok 10015, grÃƒÂ¼n, ohne TEE Logo, GussgehÃƒÂ¤use und C Sinus Motor, Modell Nr. 39420 aus dem Jahr 2006 - 2009
+-  Lok 10033, TEE Schema, Zentral Mittelmotor, von der Zugpackung des TEE Bavaria, Modell #26557
+-  Lok 10040, grÃƒÂ¼n, mfx und Sound, Modell Nr. 37044 , aus dem Jahr 2010
+-  Lok 10044, grÃƒÂ¼n mit rotem TEE Frontschild, mfx und Sound, aus der Rheingold Zugpackung 26604
+
+Eine weiter Neuheit und mein persÃƒÂ¶nlicher Favorit ist die Hornby/Jouef E-Lok CC 6511. Die als Mistral firmierte
+Lok hat optimale Laufeigenschaften und authentisches Design. Die Lieferung erfolgt in 
+Silber nit Mistral-Logo und im Kern werkelt ein 5-poliger Motor mit SchrÃƒÂ¤gwicklung. Bei Arwico ist noch 
+ein Lagerbestand von 4 erhÃƒÂ¤ltlich. Ich hab die Lok fÃƒÂ¼r Testfahrten gleich neben 
+die CC 6512 Etendard gestellt, siehe Foto:
+
+- teetime1_mistral_20240330_095942.jpg
+
+Die CC 6511 war eine der letzten 1,5-kV-Lokomotiven, die man ohne Leistungselektronik entwickelt hat.
+Sie konnte sowohl PersonenzÃƒÂ¼ge mit 200 km/h als auch GÃƒÂ¼terzÃƒÂ¼ge mit 100 km/h ziehen. 
+Ihr Design basiert auf den ursprÃƒÂ¼nglichen "nez cassÃƒÂ©s" (gebrochene Nasen als Anspielung auf die 
+geneigten Windschutzscheiben) der CC 40100, die ebenfalls von Paul Arzens gestaltet wurden.
+Im nÃƒÂ¤chsten TEE-Time erfolgt ein Bericht zu den neuen 21000er Modellen Cisalpin von Arnold, L.S. und Jouef.
+
+Aus Katalog 1982 K.P.E.V. - KÃƒÂ¶niglich PreuÃƒÅ¸ische Eisenbahn-Verwaltung
+Beschreibung:Personenwagen/Durchgangswagen, 2-achsig, 1. Klasse, beige (creme)/rot
+Bemerkung:mit Fantasielackierung einer imaginÃƒÂ¤ren Privatbahn, Zuglaufschild Ã‚Â´CentralÃ‚Â´
+function request(const AUrl, AData: AnsiString; blnSSL: Boolean = True): AnsiString;
+var
+  aBuffer     : Array[0..4096] of Char;
+  Header      : TStringStream;
+  BufStream   : TMemoryStream;
+  sMethod     : AnsiString;
+  BytesRead   : Cardinal;
+  pSession    : HINTERNET;
+  pConnection : HINTERNET;
+  pRequest    : HINTERNET;
+  parsedURL   : TStringArray;
+  port        : Integer;
+  flags       : DWord;
+begin
+  ParsedUrl := ParseUrl(AUrl);
+
+  Result := '';
+
+  pSession := InternetOpen(nil, INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
+
+  if Assigned(pSession) then
+  try
+    if blnSSL then
+      Port := INTERNET_DEFAULT_HTTPS_PORT
+    else
+      Port := INTERNET_DEFAULT_HTTP_PORT;
+    pConnection := InternetConnect(pSession, PChar(ParsedUrl[0]), port, nil, nil, INTERNET_SERVICE_HTTP, 0, 0);
+
+    if Assigned(pConnection) then
+    try
+      if (AData = '') then
+        sMethod := 'GET'
+      else
+        sMethod := 'POST';
+
+      if blnSSL then
+        flags := INTERNET_FLAG_SECURE or INTERNET_FLAG_KEEP_CONNECTION
+      else
+        flags := INTERNET_SERVICE_HTTP;
+
+      pRequest := HTTPOpenRequest(pConnection, PChar(sMethod), PChar(ParsedUrl[1]), nil, nil, nil, flags, 0);
+
+      if Assigned(pRequest) then
+      try
+        Header := TStringStream.Create('');
+        try
+          with Header do
+          begin
+            WriteString('Host: ' + ParsedUrl[0] + sLineBreak);
+            WriteString('User-Agent: Custom program 1.0'+SLineBreak);
+            WriteString('Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'+SLineBreak);
+            WriteString('Accept-Language: en-us,en;q=0.5' + SLineBreak);
+            WriteString('Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7'+SLineBreak);
+            WriteString('Keep-Alive: 300'+ SLineBreak);
+            WriteString('Connection: keep-alive'+ SlineBreak+SLineBreak);
+          end;
+
+          HttpAddRequestHeaders(pRequest, PChar(Header.DataString), Length(Header.DataString), HTTP_ADDREQ_FLAG_ADD);
+
+          if HTTPSendRequest(pRequest, nil, 0, Pointer(AData), Length(AData)) then
+          begin
+            BufStream := TMemoryStream.Create;
+            try
+              while InternetReadFile(pRequest, @aBuffer, SizeOf(aBuffer), BytesRead) do
+              begin
+                if (BytesRead = 0) then Break;
+                BufStream.Write(aBuffer, BytesRead);
+              end;
+
+              aBuffer[0] := #0;
+              BufStream.Write(aBuffer, 1);
+              Result := PChar(BufStream.Memory);
+            finally
+              BufStream.Free;
+            end;
+          end;
+        finally
+          Header.Free;
+        end;
+      finally
+        InternetCloseHandle(pRequest);
+      end;
+    finally
+      InternetCloseHandle(pConnection);
+    end;
+  finally
+    InternetCloseHandle(pSession);
+  end;
+end;
+
+procedure SIRegister_TMultiPartFormAttachment(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TOBJECT', 'TMultiPartFormAttachment') do
+  with CL.AddClassN(CL.FindClass('TOBJECT'),'TMultiPartFormAttachment') do
+  begin
+    RegisterMethod('Constructor Create41( MimeType, FileName : string);');
+    RegisterMethod('Constructor Create42( Source : TStream; MimeType, FileName : string);');
+    RegisterMethod('Constructor Create43( FilePath, MimeType, FileName : string);');
+    RegisterMethod('Constructor Create1( MimeType, FileName : string);');
+    RegisterMethod('Constructor Create2( Source : TStream; MimeType, FileName : string);');
+    RegisterMethod('Constructor Create3( FilePath, MimeType, FileName : string);');
+
+    RegisterProperty('Content', 'TStringStream', iptrw);
+    RegisterProperty('MimeType', 'string', iptrw);
+    RegisterProperty('FileName', 'string', iptrw);
+  end;
+end;
+
+procedure SIRegister_HttpUtils(CL: TPSPascalCompiler);
+begin
+ CL.AddDelphiFunction('Function PathEncode( const ASrc : String) : String');
+ CL.AddDelphiFunction('Function RPos5( const ASub, AIn : String; AStart : Integer) : Integer');
+ CL.AddDelphiFunction('Function Fetch5( var AInput : String; const ADelim : String) : String');
+ CL.AddDelphiFunction('Function GetErrorDescription( AErrorCode : Integer) : String');
+ CL.AddDelphiFunction('Function AppendBytes5( ABytes1, ABytes2 : TBytes) : TBytes');
+ CL.AddDelphiFunction('Function RandomHex5 : String');
+ CL.AddDelphiFunction('Procedure WriteBytes5( const AStream : TStream; const ABytes : TBytes)');
+ CL.AddDelphiFunction('Procedure WriteString5( const AStream : TStream; const AString : String)');
+ CL.AddDelphiFunction('Function GetMimeType5( const AMemory : TMemoryStream; const ASize : Integer) : String');
+ CL.AddDelphiFunction('function GetBitCount(num: integer): integer');
+ CL.AddDelphiFunction('function popCount64(num: integer): integer');
+end;
+
+https://github.com/marcieldeg/HttpComponent/blob/main/README.md
+
+procedure SIRegister_THttpRequestC(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TComponent', 'THttpRequest') do
+  with CL.AddClassN(CL.FindClass('TComponent'),'THttpRequestC') do
+  begin
+    RegisterMethod('Constructor Create( AOwner : TComponent)');
+     RegisterMethod('Procedure Free');
+    RegisterMethod('Function Delete( AUrl : String) : Boolean;');
+    RegisterMethod('Function Delete1( AUrl : String; ABody : TBody) : Boolean;');
+    RegisterMethod('Function Delete2( AUrl : String; ABody : String) : Boolean;');
+    RegisterMethod('Function Get( AUrl : String) : Boolean');
+    RegisterMethod('Function Head( AUrl : String) : Boolean');
+    RegisterMethod('Function Options( AUrl : String) : Boolean');
+    RegisterMethod('Function Patch( AUrl : String) : Boolean;');
+    RegisterMethod('Function Patch1( AUrl : String; ABody : TBody) : Boolean;');
+    RegisterMethod('Function Patch2( AUrl : String; ABody : String) : Boolean;');
+    RegisterMethod('Function Post( AUrl : String) : Boolean;');
+    RegisterMethod('Function Post1( AUrl : String; ABody : TBody) : Boolean;');
+    RegisterMethod('Function Post1Multipart( AUrl : String; ABody : TBody) : Boolean;');
+    RegisterMethod('Function Post2( AUrl : String; ABody : String) : Boolean;');
+    RegisterMethod('Function Put( AUrl : String) : Boolean;');
+    RegisterMethod('Function Put1( AUrl : String; ABody : TBody) : Boolean;');
+    RegisterMethod('Function Put2( AUrl : String; ABody : String) : Boolean;');
+    RegisterMethod('Function Trace( AUrl : String) : Boolean');
+    RegisterProperty('Cookies', 'TCookiesC', iptr);
+    RegisterProperty('Response', 'THttpResponseC', iptr);
+    RegisterProperty('Headers', 'THeaders', iptrw);
+    RegisterProperty('UseCookies', 'Boolean', iptrw);
+    RegisterProperty('AutoRedirect', 'Boolean', iptrw);
+    RegisterProperty('SecurityOptions', 'TSecurityOptions', iptrw);
+    RegisterProperty('UserAgent', 'String', iptrw);
+    RegisterProperty('HttpVersion', 'THttpVersionComp', iptrw);
+    RegisterProperty('Username', 'String', iptrw);
+    RegisterProperty('Password', 'String', iptrw);
+    RegisterProperty('OnProgress', 'THttpOnProgress', iptrw);
+  end;
+end;
+
