@@ -13,7 +13,7 @@ begin
   if HttpRequest1.Get('https://httpbin.org/get') then
     ShowMessage(HttpRequest1.Response.ContentAsString)
   else
-    ShowMessage('ERROR ' + IntToStr(HttpRequest1.Response.StatusCode));
+    ShowMessage('ERROR ' + getHttpcod(HttpRequest1.Response.StatusCode));
 end;
 ```
 ### POST
