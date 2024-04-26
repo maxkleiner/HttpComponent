@@ -1,5 +1,8 @@
-# HttpComponent
+# HttpComponent in maXbox5.1
 Delphi component wrapper for WinInet library. Written in Delphi 2010.
+
+![Screenshot 2024-04-25 210042](https://github.com/maxkleiner/HttpComponent/assets/3393121/00c84fc0-2f5a-457d-8d87-a86729c19765)
+
 
 ## How to use
 
