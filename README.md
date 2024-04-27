@@ -13,7 +13,7 @@ begin
   if HttpRequest1.Get('https://httpbin.org/get') then
     ShowMessage(HttpRequest1.Response.ContentAsString)
   else
-    ShowMessage('ERROR ' + getHttpcod(HttpRequest1.Response.StatusCode));
+    ShowMessage('ERROR ' + getHttpcod(HttpRequest1.Response.StatusCode2));
 end;
 ```
 ### POST
@@ -23,7 +23,7 @@ begin
   if HttpRequest1.Post('https://httpbin.org/put', 'testing a POST') then
     ShowMessage(HttpRequest1.Response.ContentAsString)
   else
-    ShowMessage('ERROR ' + IntToStr(HttpRequest1.Response.StatusCode));
+    ShowMessage('ERROR ' + IntToStr(HttpRequest1.Response.StatusCode2));
 end;
 ```
 Posting a file with a Multipart form:
