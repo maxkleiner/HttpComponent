@@ -1,0 +1,890 @@
+{# ImageAI is a Python library built to empower Computer Vision
+from imageai.Detection import ObjectDetection
+#Using TensorFlow backend.
+#https://pypi.org/project/imageai/#history
+https://imageai.readthedocs.io/en/latest/index.html
+https://imageai.readthedocs.io/en/latest/detection/
+import wget and integrate in maXbox control }
+
+program Unified_MLDetector25_EKON27_64_Integrate5;
+
+const C=CRLF; 
+const URL_APININ_DETECT = 'https://api.api-ninjas.com/v1/objectdetection/';   
+      URL_APILAY_IMG2TEXT = 'https://api.apilayer.com/image_to_text/url?url=%s'; 
+      URL_APININ_FDETECT = 'https://api.api-ninjas.com/v1/facedetect/';
+      URLIMAGEPATH4 = 'https://breitschtv.wordpress.com/wp-content/uploads/2024/07/1316_elsass_20240728_161420_resized.jpg?w=741';
+
+      
+const SCRIPTNAMEP='992_oma_objectdetector21.py';
+const //DETECTOUTFILE = 'max_ekon26_schwan.jpg'; //manmachineoutekon25.jpg'; //irobit_ekon25_out21.jpg';
+     // DETECTOUTFILE = 'dday_1980_grauzone.jpg'; 
+      DETECTOUTFILE = 'locomotion_mX5_out.jpg'; //maxekon25session2021_2.jpg ';
+      N_APIKEYold = 'gwM+_better_in_include_like_below';       //change on release !
+      
+      
+{$I .\NINJAAPIKEY.INC}
+
+const
+   N_APIKEY = NINJA_APIKEY;
+   L_APIKEY = LAYER_APIKEY;  
+   
+   
+const
+  SUSERAgent = 'Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101';
+  USERAGENT5 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'+
+                   ' Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 '; 
+  USERAGENT2 = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1';  
+  USERAGENT3 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'+
+                   ' Chrome/125.0.0.0 Safari/537.3'; // chrome + win   
+  USERAGENT4 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15'+
+                   ' (KHTML, like Gecko) Version/17.4.1 Safari/605.1.1';           // safari + mac
+  USERAGENT1 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '+    // edge + win
+                   '(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.';       
+
+const PYSCRIPT5 = 
+'from imageai.Detection import ObjectDetection'+C+
+'import wget                                  '+C+
+'import sys                                   '+C+
+'print("this first line fine")                '+C+
+'                                             '+C+
+'                                             '+C+
+'def GraphViz(node):                                           '+C+
+'    d = Graph(node)                                           '+C+
+'                                                              '+C+
+'    from graphviz import Digraph                              '+C+
+'    dot = Digraph("Graph", strict=False)                      '+C+
+'    dot.format = "png"                                        '+C+
+'                                                              '+C+
+'    def rec(nodes, parent):                                   '+C+
+'        for d in nodes:                                       '+C+
+'            if not isinstance(d, dict):                       '+C+
+'                dot.node(d, shape=d._graphvizshape)           '+C+
+'                dot.edge(d, parent)                           '+C+
+'            else:                                             '+C+
+'                for k in d:                                   '+C+
+'                    dot.node(k._name, shape=k._graphvizshape) '+C+
+'                    rec(d[k], k)                              '+C+
+'                    dot.edge(k._name, parent._name)           '+C+
+'    for k in d:                                               '+C+
+'        dot.node(k._name, shape=k._graphvizshape)             '+C+
+'        rec(d[k], k)                                          '+C+
+'    return dot                                                '+C+
+'                                                              '+C+
+'                                                              '+C+
+'detector = ObjectDetection()                                  '+C+
+'                                                              '+C+
+'url = "http://www.kleiner.ch/images/italo_max_train.jpg"      '+C+
+'url="https://softwareschulecode.files.wordpress.com/2019/12/tee_film4.png?w=750"'+C+
+'destination = "./input/film_tee_train.jpg"                    '+C+
+'                                                              '+C+
+'model_path = "./crypt/tiny-yolov3.pt"                         '+C+
+//'input_path = "./crypt/purzeltag2019.jpg" #twinwiz.jpg"ekon25web2.png        '+C+
+//'input_path=r"C:\maxbook\emachinetransfer\mX3999\SWS2014\max_sbb_katakomben.jpeg"'+C+
+//'input_path=r"C:\maxbox\maxbox5\ekon27\EKON27_Materials_2023_solution2_64\crypt\bjazz_2023.jpg"'+C+
+//'input_path=r"C:\maxbox\bfh2023\grauzone-interview-stephan_max_synthesizer.jpg"'+C+
+//'input_path=r"C:\maxbox\maxbox4\maxbox4\fotos_fest_max\max_50_kandersteg14.jpg"'+C+
+'input_path=r"C:\maxbox\maxbox51\examples\1316_elsass_20240728_161420crop.jpg"'+C+
+// 'input_path=r"./crypt/teaching20231027_095141_mX5.jpg"'+C+
+
+'                                                                  '+C+
+'#wget.download(url, out=destination) #, useragent= "maXbox5")      '+C+
+'#input_path = destination                                         '+C+
+'#output_path = "./crypt/output/manmachine.jpg"                    '+C+
+'output_path = sys.argv[1]                                         '+C+
+'                                                                  '+C+
+'#using the pre-trained TinyYOLOv3 model,                          '+C+
+'detector.setModelTypeAsTinyYOLOv3()                               '+C+
+'detector.setModelPath(model_path)                                 '+C+
+'                                                                  '+C+
+'#loads model of path specified above using setModelPath() class method.   '+C+
+'detector.loadModel()                                                      '+C+
+'                                                                          '+C+
+'custom=detector.CustomObjects(person=True,laptop=True,car=False,train=True,'+C+
+'                       clock=True, chair=False, bottle=False, keyboard=True)'+C+
+'                                                                          '+C+
+'detections=detector.detectObjectsFromImage(custom_objects=custom,  \'+C+
+'                  input_image=input_path, output_image_path=output_path, \'+C+
+'                                     minimum_percentage_probability=20.0) '+C+
+'                                                                          '+C+
+'for eachItem in detections:                                               '+C+
+'    print(eachItem["name"] ," : ", eachItem["percentage_probability"])    '+C+
+'                                                                          '+C+
+'print("integrate image detector compute ends...") ';
+//*)
+
+function TestHTTPClassComponentAPIDetection2(AURL, askstream, aApikey: string): string;
+var HttpReq1: THttpRequestC;
+    Body: TMultipartFormBody;
+    Body2: TUrlEncodedFormBody;  //ct: TCountryCode;
+begin
+  Body:= TMultipartFormBody.Create;
+  Body.ReleaseAfterSend:= True;
+  //Body.Add('code','2','application/octet-stream');
+  //Body.AddFromFile('image', exepath+'randimage01.jpg');
+  Body.AddFromFile('image',
+         //'C:\maxbox\maxbox51\examples\marklin-83019-br-218-europa-ac-analog.jpg');
+         // 'C:\maxbox\maxbox4\maxbox4\fotos_fest_max\max_50_kandersteg14.jpg');
+         'C:\maxbox\maxbox51\examples\1316_elsass_20240728_161420_resized.jpg');
+  
+  HttpReq1:= THttpRequestC.create(self);
+  httpreq1.useragent:= USERAGENT3;
+  HttpReq1.headers.add('X-Api-Key:'+AAPIKEY);
+  HttpReq1.headers.add('Accept:application/json');
+  HttpReq1.SecurityOptions:= [soSsl3, soPct, soIgnoreCertCNInvalid];
+  try
+    if HttpReq1.Post1Multipart(AURL, body) then 
+       result:=HttpReq1.Response.ContentAsString
+    else Writeln('APIError '+inttostr(HttpReq1.Response.StatusCode2));
+  finally  
+    writeln('Status3: '+gethttpcod(HttpReq1.Response.statuscode2))
+    HttpReq1.Free;  
+    sleep(200)
+    // if assigned(body) then body.free;
+  end; 
+end;
+
+function TestHTTPClassCompFaceDetect5(AURL, askstream, aApikey: string): string;
+var HttpReq1: THttpRequestC;
+    Body: TMultipartFormBody;
+    Body2: TUrlEncodedFormBody;  //ct: TCountryCode;
+begin
+  Body:= TMultipartFormBody.Create;
+  Body.ReleaseAfterSend:= True;
+  //Body.Add('code','2','application/octet-stream');
+  //Body.AddFromFile('image', exepath+'randimage01.jpg');
+  Body.AddFromFile('image',
+         //'C:\maxbox\maxbox51\examples\marklin-83019-br-218-europa-ac-analog.jpg');
+         // 'C:\maxbox\maxbox4\maxbox4\fotos_fest_max\max_50_kandersteg14.jpg');
+         'C:\maxbox\maxbox51\examples\1316_elsass_20240728_161420_resized.jpg');
+  
+  HttpReq1:= THttpRequestC.create(self);
+  httpreq1.useragent:= USERAGENT3;
+  HttpReq1.headers.add('X-Api-Key:'+AAPIKEY);
+  HttpReq1.headers.add('Accept:application/json');
+  HttpReq1.SecurityOptions:= [soSsl3, soPct, soIgnoreCertCNInvalid];
+  try
+    if HttpReq1.Post1Multipart(AURL, body) then 
+       result:=HttpReq1.Response.ContentAsString
+    else Writeln('APIError '+inttostr(HttpReq1.Response.StatusCode2));
+  finally  
+    writeln('Status3: '+gethttpcod(HttpReq1.Response.statuscode2))
+    HttpReq1.Free;  
+    sleep(200)
+    // if assigned(body) then body.free;
+  end; 
+end;
+
+function Image_to_text_API2(AURL, url_imgpath, aApikey: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  rets:= TStringStream.create('');
+  heads:= TStringlist.create;     
+  try 
+    heads.add('apikey='+aAPIkey);
+    iht:= httpq.setHeaders(heads);
+    httpq.Get(Format(AURL,[url_imgpath]), rets);
+    if httpq.getresponsecode=200 Then result:= rets.datastring
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+  end;                  
+end;                 //}
+
+procedure PyCode(imgpath, apikey: string);
+begin
+  with TPythonEngine.Create(Nil) do begin
+  //pythonhome:= 'C:\Users\breitsch\AppData\Local\Programs\Python\Python37-32\';
+  try
+    loadDLL;
+    autofinalize:= false;
+    ExecString('import requests, sys');
+    ExecStr('url= "https://api.apilayer.com/image_to_text/url?url='+imgpath+'"'); 
+    ExecStr('payload = {}');  
+    ExecStr('headers= {"apikey": "'+apikey+'"}'); 
+    Println(EvalStr('requests.request("GET",url, headers=headers, data=payload).text'));  
+    Println('Version: '+EvalStr('sys.version'));  
+  except
+    raiseError();        
+  finally       
+    free;
+  end; 
+ end;
+end; 
+
+const ACTIVESCRIPT = PYSCRIPT5;
+
+var RUNSCRIPT, outputPath, ParentName, outstr, backstr: string;
+    startTime64, endTime64, freq64: Int64;
+
+begin //@main
+  //-init
+  maxform1.console1click(self);
+  memo2.height:= 205;
+  QueryPerformanceFrequency(freq64);
+  //ParentName:= strlower(GetParentProcessName());
+  ParentName:= PathExtractName(ParentName); 
+  outstr:= ACTIVESCRIPT;
+  //-config
+  memo2.clear;
+  memo2.lines.add(ACTIVESCRIPT);
+  memo2.lines.savetofile(exepath+SCRIPTNAMEP);
+  //SaveStrAToFile((ACTIVESCRIPT), exepath+SCRIPTNAMEP);
+  sleep(400)
+  outputPath:= '.\crypt\'+DETECTOUTFILE;
+  //writeln(parentname)
+  //if(ParentName='cmd.exe')or(ParentName='powershell.exe')then begin
+  try
+    AttachConsole(-1);
+    NativeWriteln('Start with maXbox5 Console Output--->');
+  except
+    writeln('no console attached.. ')
+  end; 
+  Writeln('Start with maXbox51 ImageAI Detector --->'); 
+  //end;  
+  //FreeConsole();
+ { 
+  if fileExists(exepath+SCRIPTNAMEP) then begin
+    RUNSCRIPT:= exepath+SCRIPTNAMEP;
+    QueryPerformanceCounter(startTime64);
+   // writeln(getDosOutput('py -3.7-32 '+'"'+RUNSCRIPT+'"'+' '+outputpath, exePath));
+    writeln(getDosOutput('py -3.11 '+'"'+RUNSCRIPT+'"'+' '+outputpath, exePath));
+ 
+    QueryPerformanceCounter(endTime64);
+    println('elapsedSeconds:= '+floattostr((endTime64-startTime64)/freq64));
+    openFile(outputPath)
+  end;    //}
+
+  // writeln(getDosOutput('maXbox4.exe 755_science_ibz_spektrum3.txt', exePath));
+  //if(ParentName='cmd.exe')or(ParentName='powershell.exe')then begin
+  try
+    NativeWriteln(memo2.text);
+    NativeWriteln('Stop with Return Key--->');
+    FreeConsole();
+  except
+    writeln('no console attached.. ')
+  end;    
+  //end;  
+  //FreeConsole();
+    //second solution
+  { backstr:= TestHTTPClassComponentAPIDetection2(URL_APININ_DETECT,' askstream',N_APIKEY);
+     println('back '+formatjson2((backstr),3));
+        //}
+   backstr:= '';     
+   backstr:= TestHTTPClassCompFaceDetect5(URL_APININ_FDETECT, '',N_APIKEY);  
+   println('back2 '+formatjson2((backstr),3));
+   if isInternetconnected then begin     
+     //third solution     
+      writeln(parsejsonvalue(Image_to_text_API2(URL_APILAY_IMG2TEXT, URLIMAGEPATH4, L_APIKEY))); 
+   
+     //forth solution
+     //Pycode(URLIMAGEPATH4, L_APIKEY);     
+   end;                                     
+end.  
+
+ ref: https://softwareschule.code.blog/2024/07/29/4-machine-learning-object-detection-solutions/
+ 
+      https://softwareschule.code.blog/2024/04/27/object-detection-api/
+ 
+      1. Integrate Python ImageAI
+      2. THttpRequestC RestClient
+      3. THttpConnectionWinInet WinInet API
+      4. Integrate Python4Delphi   
+      
+        Algorithm Data    Result
+    1.  local -   local - local
+    2.  cloud -   local - local/cloud
+    3.  cloud -   cloud - local/cloud
+    4.  cloud -   cloud - local
+
+ ref: https://stackoverflow.com/questions/43434028/how-to-pip-install-64-bit-packages-while-having-both-64-bit-and-32-bit-versions
+ 
+ ref: ine 54, in <module>
+    detections=detector.detectCustomObjectsFromImage(custom_objects=custom,  \
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ObjectDetection' object has no attribute 'detectCustomObjectsFromImage'. 
+Did you mean: 'detectObjectsFromImage'?
+
+pip install cython pillow>=7.0.0 numpy>=1.18.1 opencv-python>=4.1.2 torch>=1.9.0 --extra-index-url https://download.pytorch.org/whl/cpu torchvision>=0.10.0 
+--extra-index-url https://download.pytorch.org/whl/cpu pytest==7.1.3 tqdm==4.64.1 scipy>=1.7.3 matplotlib>=3.4.3 mock==4.0.3
+
+ C:\Users\breitsch\AppData\Local\Programs\Python\Python38>python -m pip install imageai
+Collecting imageai
+  Using cached imageai-2.1.6-py3-none-any.whl (160 kB)
+Requirement already satisfied: matplotlib==3.3.2 in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from imageai) (3.3.2)
+Collecting opencv-python
+  Downloading opencv_python-4.5.4.58-cp38-cp38-win_amd64.whl (35.1 MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 35.1 MB 6.4 MB/s
+Collecting keras==2.4.3
+  Using cached Keras-2.4.3-py2.py3-none-any.whl (36 kB)
+Collecting pillow==7.0.0
+  Downloading Pillow-7.0.0-cp38-cp38-win_amd64.whl (2.0 MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 2.0 MB 1.6 MB/s
+Collecting keras-resnet==0.2.0
+  Using cached keras-resnet-0.2.0.tar.gz (9.3 kB)
+Collecting scipy==1.4.1
+  Downloading scipy-1.4.1-cp38-cp38-win_amd64.whl (31.0 MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 31.0 MB 6.4 MB/s
+Collecting numpy==1.19.3
+  Downloading numpy-1.19.3-cp38-cp38-win_amd64.whl (13.3 MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 13.3 MB 6.8 MB/s
+Requirement already satisfied: h5py==2.10.0 in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from imageai) (2.10.0)
+Requirement already satisfied: python-dateutil>=2.1 in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from matplotlib==3.3.2->imageai) (2.8.1)
+Requirement already satisfied: kiwisolver>=1.0.1 in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from matplotlib==3.3.2->imageai) (1.2.0)
+Requirement already satisfied: certifi>=2020.06.20 in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from matplotlib==3.3.2->imageai) (2020.6.20)
+Requirement already satisfied: pyparsing!=2.0.4,!=2.1.2,!=2.1.6,>=2.0.3 in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from matplotlib==3.3.2->imageai) (2.4.7)
+Requirement already satisfied: cycler>=0.10 in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from matplotlib==3.3.2->imageai) (0.10.0)
+Collecting pyyaml
+  Downloading PyYAML-6.0-cp38-cp38-win_amd64.whl (155 kB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 155 kB ...
+Requirement already satisfied: six in c:\users\breitsch\appdata\local\programs\python\python38\lib\site-packages (from h5py==2.10.0->imageai) (1.15.0)
+Building wheels for collected packages: keras-resnet
+  Building wheel for keras-resnet (setup.py) ... done
+  Created wheel for keras-resnet: filename=keras_resnet-0.2.0-py2.py3-none-any.whl size=20490 sha256=d2422d60d9cced0f8187ffaee05bfde5170fd975a30feab18548dc676ba07077
+  Stored in directory: c:\users\breitsch\appdata\local\pip\cache\wheels\be\90\98\9d455f04a7ca277366b36c660c89d171ff5abb7bdd8a8b8e75
+Successfully built keras-resnet
+Installing collected packages: numpy, opencv-python, scipy, pyyaml, keras, pillow, keras-resnet, imageai
+  Attempting uninstall: numpy
+    Found existing installation: numpy 1.18.5
+    Uninstalling numpy-1.18.5:
+      Successfully uninstalled numpy-1.18.5
+  Attempting uninstall: scipy
+    Found existing installation: scipy 1.5.2
+    Uninstalling scipy-1.5.2:
+      Successfully uninstalled scipy-1.5.2
+  Attempting uninstall: pillow
+    Found existing installation: Pillow 7.2.0
+    Uninstalling Pillow-7.2.0:
+      Successfully uninstalled Pillow-7.2.0
+ERROR: After October 2020 you may experience errors when installing or updating packages. This is because pip will change the way that it resolves dependency conflicts.
+
+We recommend you use --use-feature=2020-resolver to test your packages with the new resolver before it becomes the default.
+
+tensorflow 2.3.1 requires numpy<1.19.0,>=1.16.0, but you'll have numpy 1.19.3 which is incompatible.
+Successfully installed imageai-2.1.6 keras-2.4.3 keras-resnet-0.2.0 numpy-1.19.3 opencv-python-4.5.4.58 pillow-7.0.0 pyyaml-6.0 scipy-1.4.1
+WARNING: You are using pip version 20.2.3; however, version 21.3.1 is available.
+You should consider upgrading via the 'C:\Users\breitsch\AppData\Local\Programs\Python\Python38\python.exe -m pip install --upgrade pip' command.
+
+Technically, it's not an error, it's a warning. It's mainly just verbose, so you can safely ignore it. To silence it, do this in the correct order. You will also need to restart your kernel for now.
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+import tensorflow as tf
+
+2021-10-30 10:50:47.532288: W tensorflow/stream_executor/platform/default/dso_loader.cc:59] Could not load dynamic library 'cudart64_101.dll'; dlerror: cudart64_101.dll not found
+2021-10-30 10:50:47.532312: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2021-10-30 10:50:49.434662: W tensorflow/stream_executor/platform/default/dso_loader.cc:59] Could not load dynamic library 'nvcuda.dll'; dlerror: nvcuda.dll not found
+2021-10-30 10:50:49.434691: W tensorflow/stream_executor/cuda/cuda_driver.cc:312] failed call to cuInit: UNKNOWN ERROR (303)
+2021-10-30 10:50:49.439066: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:169] retrieving CUDA diagnostic information for host: BREITSCH-BOX
+2021-10-30 10:50:49.439194: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:176] hostname: BREITSCH-BOX
+2021-10-30 10:50:49.440299: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN)to use the following 
+CPU instructions in performance-critical operations:  AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2021-10-30 10:50:49.461185: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x1bba71e4320 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2021-10-30 10:50:49.461227: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+this first line fine
+Traceback (most recent call last):
+  File "C:\Program Files\Streaming\IBZ2021\Module2_3\992_oma_objectdetector21.py", line 49, in <module>
+    detector.loadModel()                                                      
+  File "C:\Users\breitsch\AppData\Local\Programs\Python\Python38\lib\site-packages\imageai\Detection\__init__.py", line 195, in loadModel
+    model.load_weights(self.modelPath)
+  File "C:\Users\breitsch\AppData\Local\Programs\Python\Python38\lib\site-packages\tensorflow\python\keras\engine\training.py", line 2204, in load_weights
+    with h5py.File(filepath, 'r') as f:
+  File "C:\Users\breitsch\AppData\Local\Programs\Python\Python38\lib\site-packages\h5py\_hl\files.py", line 406, in __init__
+    fid = make_fid(name, mode, userblock_size,
+  File "C:\Users\breitsch\AppData\Local\Programs\Python\Python38\lib\site-packages\h5py\_hl\files.py", line 173, in make_fid
+    fid = h5f.open(name, flags, fapl=fapl)
+  File "h5py\_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py\_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py\h5f.pyx", line 88, in h5py.h5f.open
+OSError: Unable to open file (unable to open file: name = './crypt/models/yolo-tiny.h5', errno = 2, error message = 'No such file or directory', 
+flags = 0, o_flags = 0)
+
+
+#//----app_template_loaded_code----
+#//----File newtemplate.txt not exists - now saved!----
+#https://stackabuse.com/object-detection-with-imageai-in-python/
+# https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/yolo-tiny.h5
+#https://imageai.readthedocs.io/en/latest/detection/index.html
+
+https://github.com/dsblank/simple_kernel
+https://forum.lazarus.freepascal.org/index.php?topic=38955.0
+https://ipython-books.github.io/16-creating-a-simple-kernel-for-jupyter/
+
+The kernel and client live in different processes and this decoupling between the client and kernel makes it possible to write kernels in any language. 
+They communicate via messaging 
+protocols 
+(I think its 0MQ) implemented on top of network sockets and these messages are encoded in JSON in a text-based document format.
+
+"""
+There are 80 possible objects that you can detect with the
+ObjectDetection class, and they are as seen below.
+
+  person, bicycle, car, motorcycle, airplane, bus,train,truck,boat,traffic light,fire hydrant, stop_sign, parking meter, bench, bird, cat,dog, horse, sheep, cowelephant,bear, zebra, giraffe, 
+  backpack, umbrella,handbag,tie, suitcase,frisbee, skis,snowboard, sports ball,kite,baseball bat,baseball glove,skateboard,surfboard,tennis racket, bottle,wine glass,cup,fork, knife, spoon, 
+  bowl, banana, apple,sandwich, orange, broccoli, carrot, hot dog, pizza,donot, cake,chair,couch, potted plant, bed, dining table,toilet,tv, laptop, mouse,remote,keyboard, cell phone,microwave, 
+  oven, toaster,sink,refrigerator, book,clock,vase,scissors,teddy bear,hair dryer,toothbrush.
+
+To detect only some of the objects above, you will need to call the CustomObjects function and set the name of the
+object(s) yiu want to detect to through. The rest are False by default. In below example, we detected only chose detect only person and dog.
+
+custom = detector.CustomObjects(person=True, dog=True)
+
+this first line fine
+person  :  11.582126468420029
+person  :  15.317463874816895
+person  :  25.40428638458252
+person  :  41.63033664226532
+person  :  42.076510190963745
+integrate image detector compute ends...
+
+>>> console output:
+car  :  54.72719669342041
+car  :  97.26507663726807
+car  :  97.5576639175415
+person  :  53.6459743976593
+person  :  56.598347425460815
+person  :  72.28184938430786
+laptop  :  57.53162503242493
+bottle  :  10.687477886676788
+bottle  :  11.373373866081238
+
+image detector compute ends...
+image detector compute ends...
+"""
+
+Anspruch:
+Die Safety-Measures sind Massnahmen, welche du im Design und der Implementierung umsetzt, um die Software sicher zu gestalten. Die meisten Safety-Measures 
+wurden bereits durch die Risikoanalyse gefunden, 
+die weiteren findest du auf Grund deiner Erfahrung oder der anzuwendenden Norm. 
+Die Safety-Measures, welche ich immer wieder angetroffen habe sind:
+
+    Bereichsprüfungen an Schnittstellen von Komponenten
+    Prüfung der zwischengespeicherten Daten mit CRC oder redundanten Daten
+    Plausibilitätsprüfungen über verschiedene Daten-Arten
+    Programmflussüberwachung
+    Runtime-Tests zur Sicherstellung der Korrektheit des Prozessors, wie z.B. RAM, ROM
+    Prüfungen auf nullptr
+    Zyklisches verarbeiten und versenden der Daten
+
+Wirklichkeit:    
+no console attached.. 
+Using TensorFlow backend.
+C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\tensorflow\python\framework\dtypes.py:493: FutureWarning: Passing (type, 1) or '1type' as a 
+synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint8 = np.dtype([("qint8", np.int8, 1)])
+C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\tensorflow\python\framework\dtypes.py:494: FutureWarning: Passing (type, 1) or '1type' as a 
+synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_quint8 = np.dtype([("quint8", np.uint8, 1)])
+C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\tensorflow\python\framework\dtypes.py:495: FutureWarning: Passing (type, 1) or '1type' as 
+a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint16 = np.dtype([("qint16", np.int16, 1)])
+C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\tensorflow\python\framework\dtypes.py:496: FutureWarning: Passing (type, 1) or '1type' as 
+a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_quint16 = np.dtype([("quint16", np.uint16, 1)])
+C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\tensorflow\python\framework\dtypes.py:497: FutureWarning: Passing (type, 1) or '1type' as 
+a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint32 = np.dtype([("qint32", np.int32, 1)])
+C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\tensorflow\python\framework\dtypes.py:502: FutureWarning: Passing (type, 1) or '1type' as 
+a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  np_resource = np.dtype([("resource", np.ubyte, 1)])
+this first line fine
+Traceback (most recent call last):
+  File "C:\maXbox\mX47464\maxbox4\992_oma_objectdetector21.py", line 49, in <module>
+    detector.loadModel()                                                      
+  File "C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\imageai\Detection\__init__.py", line 223, in loadModel
+    model.load_weights(self.modelPath)
+  File "C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\keras\engine\topology.py", line 2658, in load_weights
+    with h5py.File(filepath, mode='r') as f:
+  File "C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\h5py\_hl\files.py", line 408, in __init__
+    swmr=swmr)
+  File "C:\Users\max\AppData\Local\Programs\Python\Python36\lib\site-packages\h5py\_hl\files.py", line 173, in make_fid
+    fid = h5f.open(name, flags, fapl=fapl)
+  File "h5py\_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py\_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py\h5f.pyx", line 88, in h5py.h5f.open
+OSError: Unable to open file (unable to open file: name = './crypt/models/yolo-tiny.h5', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)
+
+elapsedSeconds:= 72.9123107956682
+no console attached.. 
+ mX4 executed: 28/04/2021 15:10:21  Runtime: 0:2:32.191  Memload: 65% use
+PascalScript maXbox4 - RemObjects & SynEdit
+
+OpenSSL> pkcs12 -inkey tkey.pem -in tcert.pem -export -out certs\tcertificate.p1
+2
+Enter pass phrase for tkey.pem:
+unable to load private key
+7112:error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt:.\
+crypto\evp\evp_enc.c:531:
+7112:error:23077074:PKCS12 routines:PKCS12_pbe_crypt:pkcs12 cipherfinal error:.\
+crypto\pkcs12\p12_decr.c:108:
+7112:error:2306A075:PKCS12 routines:PKCS12_item_decrypt_d2i:pkcs12 pbe crypt err
+or:.\crypto\pkcs12\p12_decr.c:139:
+7112:error:0907B00D:PEM routines:PEM_READ_BIO_PRIVATEKEY:ASN1 lib:.\crypto\pem\p
+em_pkey.c:141:
+error in pkcs12
+OpenSSL> pkcs12 -inkey certs3\tkeybale.pem -in certs3\tcertbale.pem -export -out
+ certs3\tcertificatebale.p12
+Enter pass phrase for certs3\tkeybale.pem:
+Enter Export Password:
+Verifying - Enter Export Password:
+OpenSSL>
+
+C:\maXbox\works2021\maxbox4>pip3 install imageai
+Collecting imageai
+  Downloading https://files.pythonhosted.org/packages/73/44/3d5d8ef572888025666e
+ec284e85f9243faf06ca8c12085dcff1ca9754ed/imageai-2.1.6-py3-none-any.whl (160kB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 163kB 1.6MB/s
+Collecting pillow==7.0.0 (from imageai)
+  Downloading https://files.pythonhosted.org/packages/88/6b/66f502b5ea615f69433a
+e1e23ec786b2cdadbe41a5cfb1e1fabb4f9c6ce9/Pillow-7.0.0-cp37-cp37m-win_amd64.whl (
+2.0MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 2.0MB 1.7MB/s
+Requirement already satisfied: opencv-python in c:\users\max\appdata\local\progr
+ams\python\python37\lib\site-packages (from imageai) (4.1.0.25)
+Collecting keras-resnet==0.2.0 (from imageai)
+  Downloading https://files.pythonhosted.org/packages/76/d4/a35cbd07381139dda4db
+42c81b88c59254faac026109022727b45b31bcad/keras-resnet-0.2.0.tar.gz
+Collecting matplotlib==3.3.2 (from imageai)
+  Downloading https://files.pythonhosted.org/packages/81/51/dadfa4433ec13d996639
+3b1726a5c22d7773433aa7797b48980965f32e07/matplotlib-3.3.2-cp37-cp37m-win_amd64.w
+hl (8.5MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 8.5MB 3.3MB/s
+Collecting h5py==2.10.0 (from imageai)
+  Downloading https://files.pythonhosted.org/packages/a1/6b/7f62017e3f0b32438dd9
+0bdc1ff0b7b1448b6cb04a1ed84f37b6de95cd7b/h5py-2.10.0-cp37-cp37m-win_amd64.whl (2
+.5MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 2.5MB 1.7MB/s
+Collecting keras==2.4.3 (from imageai)
+  Downloading https://files.pythonhosted.org/packages/44/e1/dc0757b20b56c980b555
+3c1b5c4c32d378c7055ab7bfa92006801ad359ab/Keras-2.4.3-py2.py3-none-any.whl
+Collecting numpy==1.19.3 (from imageai)
+  Downloading https://files.pythonhosted.org/packages/e8/c8/9a55f91d4a08652095bd
+bdfb3b2bb98e7d61146ef3341e3744bc3e7d7021/numpy-1.19.3-cp37-cp37m-win_amd64.whl (
+13.2MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 13.3MB 3.3MB/s
+Collecting scipy==1.4.1 (from imageai)
+  Downloading https://files.pythonhosted.org/packages/61/51/046cbc61c7607e5ecead
+6ff1a9453fba5e7e47a5ea8d608cc7036586a5ef/scipy-1.4.1-cp37-cp37m-win_amd64.whl (3
+0.9MB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 30.9MB 56kB/s
+Collecting certifi>=2020.06.20 (from matplotlib==3.3.2->imageai)
+  Downloading https://files.pythonhosted.org/packages/37/45/946c02767aabb8731460
+11e665728b680884cd8fe70dde973c640e45b775/certifi-2021.10.8-py2.py3-none-any.whl
+(149kB)
+     |¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦| 153kB 1.1MB/s
+Requirement already satisfied: cycler>=0.10 in c:\users\max\appdata\local\progra
+ms\python\python37\lib\site-packages (from matplotlib==3.3.2->imageai) (0.10.0)
+Requirement already satisfied: kiwisolver>=1.0.1 in c:\users\max\appdata\local\p
+rograms\python\python37\lib\site-packages (from matplotlib==3.3.2->imageai) (1.1
+.0)
+Requirement already satisfied: python-dateutil>=2.1 in c:\users\max\appdata\loca
+l\programs\python\python37\lib\site-packages (from matplotlib==3.3.2->imageai) (
+2.7.5)
+Requirement already satisfied: pyparsing!=2.0.4,!=2.1.2,!=2.1.6,>=2.0.3 in c:\us
+ers\max\appdata\local\programs\python\python37\lib\site-packages (from matplotli
+b==3.3.2->imageai) (2.4.0)
+Requirement already satisfied: six in c:\users\max\appdata\local\programs\python
+\python37\lib\site-packages (from h5py==2.10.0->imageai) (1.12.0)
+Requirement already satisfied: pyyaml in c:\users\max\appdata\local\programs\pyt
+hon\python37\lib\site-packages (from keras==2.4.3->imageai) (3.13)
+Requirement already satisfied: setuptools in c:\users\max\appdata\local\programs
+\python\python37\lib\site-packages (from kiwisolver>=1.0.1->matplotlib==3.3.2->i
+mageai) (40.8.0)
+Building wheels for collected packages: keras-resnet
+  Building wheel for keras-resnet (setup.py) ... done
+  Stored in directory: C:\Users\Max\AppData\Local\pip\Cache\wheels\5f\09\a5\497a
+30fd9ad9964e98a1254d1e164bcd1b8a5eda36197ecb3c
+Successfully built keras-resnet
+ERROR: mxnet 1.4.0.post0 has requirement numpy<1.15.0,>=1.8.2, but you'll have n
+umpy 1.19.3 which is incompatible.
+ERROR: magenta 1.1.1 has requirement scipy<=1.2.0,>=0.18.1, but you'll have scip
+y 1.4.1 which is incompatible.
+ERROR: kubernetes 10.0.0 has requirement urllib3>=1.23, but you'll have urllib3
+1.22 which is incompatible.
+ERROR: chatterbot 1.0.5 has requirement pyyaml<5.2,>=5.1, but you'll have pyyaml
+ 3.13 which is incompatible.
+Installing collected packages: pillow, numpy, scipy, h5py, keras, keras-resnet,
+certifi, matplotlib, imageai
+  Found existing installation: Pillow 6.0.0
+    Uninstalling Pillow-6.0.0:
+      Successfully uninstalled Pillow-6.0.0
+  Found existing installation: numpy 1.16.3
+    Uninstalling numpy-1.16.3:
+      Successfully uninstalled numpy-1.16.3
+  Found existing installation: scipy 1.2.0
+    Uninstalling scipy-1.2.0:
+      Successfully uninstalled scipy-1.2.0
+  Found existing installation: h5py 2.9.0
+    Uninstalling h5py-2.9.0:
+      Successfully uninstalled h5py-2.9.0
+  Found existing installation: Keras 2.2.4
+    Uninstalling Keras-2.2.4:
+      Successfully uninstalled Keras-2.2.4
+  Found existing installation: certifi 2019.3.9
+    Uninstalling certifi-2019.3.9:
+      Successfully uninstalled certifi-2019.3.9
+  Found existing installation: matplotlib 3.0.3
+    Uninstalling matplotlib-3.0.3:
+      Successfully uninstalled matplotlib-3.0.3
+Successfully installed certifi-2021.10.8 h5py-2.10.0 imageai-2.1.6 keras-2.4.3 k
+eras-resnet-0.2.0 matplotlib-3.3.2 numpy-1.19.3 pillow-7.0.0 scipy-1.4.1
+WARNING: You are using pip version 19.1, however version 21.3.1 is available.
+You should consider upgrading via the 'python -m pip install --upgrade pip' comm
+and.
+
+C:\maXbox\works2021\maxbox4>
+
+no console attached.. 
+2021-11-14 15:10:04.650407: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cudart64_110.dll'; dlerror: cudart64_110.dll not found
+2021-11-14 15:10:04.675952: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+Traceback (most recent call last):
+  File "C:\maXbox\works2021\maxbox4\992_oma_objectdetector21.py", line 2, in <module>
+    import wget                                  
+ModuleNotFoundError: No module named 'wget'
+
+C:\maXbox\works2021\maxbox4>pip3 install wget
+Collecting wget
+  Downloading https://files.pythonhosted.org/packages/47/6a/62e288da7bcda82b935f
+f0c6cfe542970f04e29c756b0e147251b2fb251f/wget-3.2.zip
+Building wheels for collected packages: wget
+  Building wheel for wget (setup.py) ... done
+  Stored in directory: C:\Users\Max\AppData\Local\pip\Cache\wheels\40\15\30\7d8f
+7cea2902b4db79e3fea550d7d7b85ecb27ef992b618f3f
+Successfully built wget
+Installing collected packages: wget
+Successfully installed wget-3.2
+WARNING: You are using pip version 19.1, however version 21.3.1 is available.
+You should consider upgrading via the 'python -m pip install --upgrade pip' comm
+and.
+
+ File "C:\Users\Max\AppData\Local\Programs\Python\Python37\lib\site-packages\imageai\Detection\__init__.py", line 482, in detectCustomObjectsFromImage
+    custom_objects=custom_objects)
+  File "C:\Users\Max\AppData\Local\Programs\Python\Python37\lib\site-packages\imageai\Detection\__init__.py", line 392, in detectObjectsFromImage
+    "Ensure you specified correct input image, input type, output type and/or output image path ")
+ValueError: Ensure you specified correct input image, input type, output type and/or output image path 
+
+2021-11-15 16:20:16.901634: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cudart64_110.dll'; dlerror: cudart64_110.dll not found
+2021-11-15 16:20:16.901685: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2021-11-15 16:21:09.727722: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cudart64_110.dll'; dlerror: cudart64_110.dll not found
+2021-11-15 16:21:09.729218: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cublas64_11.dll'; dlerror: cublas64_11.dll not found
+2021-11-15 16:21:09.730717: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cublasLt64_11.dll'; dlerror: cublasLt64_11.dll not found
+2021-11-15 16:21:09.732167: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cufft64_10.dll'; dlerror: cufft64_10.dll not found
+2021-11-15 16:21:09.733612: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'curand64_10.dll'; dlerror: curand64_10.dll not found
+2021-11-15 16:21:09.735890: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cusolver64_11.dll'; dlerror: cusolver64_11.dll not found
+2021-11-15 16:21:09.738338: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cusparse64_11.dll'; dlerror: cusparse64_11.dll not found
+2021-11-15 16:21:09.740761: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cudnn64_8.dll'; dlerror: cudnn64_8.dll not found
+2021-11-15 16:21:09.740809: W tensorflow/core/common_runtime/gpu/gpu_device.cc:1850] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above 
+are installed properly if you would like to use GPU. Follow the 
+guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
+Skipping registering GPU devices...
+2021-11-15 16:21:09.741284: I tensorflow/core/platform/cpu_feature_guard.cc:151] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions 
+in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+C:\maXbox\works2021\maxbox4\992_oma_objectdetector21.py:56: DeprecationWarning: 'detectCustomObjectsFromImage()' function has been deprecated and will be removed in future versions of ImageAI. 
+ Kindly use 'detectObjectsFromImage()' 
+  minimum_percentage_probability=40.0)
+WARNING: Logging before flag parsing goes to stderr.
+W1115 16:21:10.558843   304 ag_logging.py:146] AutoGraph could not transform <function Model.make_predict_function.<locals>.predict_function at 0x0000025B24949268> and will run it as-is.
+Please report this to the TensorFlow team. When filing the bug, set the verbosity to 10 (on Linux, `export AUTOGRAPH_VERBOSITY=10`) and attach the full output.
+Cause: 'arguments' object has no attribute 'posonlyargs'
+To silence this warning, decorate the function with @tf.autograph.experimental.do_not_convert
+this first line fine
+person  :  55.95281720161438
+person  :  66.63782596588135
+person  :  46.17394208908081
+person  :  41.51414334774017
+person  :  64.7615909576416
+person  :  64.41770792007446
+integrate image detector compute ends...
+
+no console attached.. 
+2022-07-05 17:07:22.653382: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cudart64_110.dll'; dlerror: cudart64_110.dll not found
+2022-07-05 17:07:22.653432: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2022-07-05 17:07:28.863429: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cudart64_110.dll'; dlerror: cudart64_110.dll not found
+2022-07-05 17:07:28.865528: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cublas64_11.dll'; dlerror: cublas64_11.dll not found
+2022-07-05 17:07:28.867963: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cublasLt64_11.dll'; dlerror: cublasLt64_11.dll not found
+2022-07-05 17:07:28.870357: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cufft64_10.dll'; dlerror: cufft64_10.dll not found
+2022-07-05 17:07:28.872728: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'curand64_10.dll'; dlerror: curand64_10.dll not found
+2022-07-05 17:07:28.875087: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cusolver64_11.dll'; dlerror: cusolver64_11.dll not found
+2022-07-05 17:07:28.877446: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cusparse64_11.dll'; dlerror: cusparse64_11.dll not found
+2022-07-05 17:07:28.879499: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'cudnn64_8.dll'; dlerror: cudnn64_8.dll not found
+2022-07-05 17:07:28.879546: W tensorflow/core/common_runtime/gpu/gpu_device.cc:1850] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above are installed 
+properly if you would like to use GPU. Follow 
+the guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
+Skipping registering GPU devices...
+2022-07-05 17:07:28.879853: I tensorflow/core/platform/cpu_feature_guard.cc:151] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following 
+CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+C:\maXbox\works2021\maxbox4\992_oma_objectdetector21.py:56: DeprecationWarning: 'detectCustomObjectsFromImage()' function has been deprecated and will be removed in future versions of ImageAI. 
+ Kindly use 'detectObjectsFromImage()' 
+  minimum_percentage_probability=40.0)
+this first line fine
+Traceback (most recent call last):
+  File "C:\Users\Max\AppData\Local\Programs\Python\Python37\lib\site-packages\imageai\Detection\__init__.py", line 294, in detectObjectsFromImage
+    image_h, image_w, _ = detected_copy.shape
+AttributeError: 'NoneType' object has no attribute 'shape'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\maXbox\works2021\maxbox4\992_oma_objectdetector21.py", line 56, in <module>
+    minimum_percentage_probability=40.0) 
+  File "C:\Users\Max\AppData\Local\Programs\Python\Python37\lib\site-packages\imageai\Detection\__init__.py", line 482, in detectCustomObjectsFromImage
+    custom_objects=custom_objects)
+  File "C:\Users\Max\AppData\Local\Programs\Python\Python37\lib\site-packages\imageai\Detection\__init__.py", line 392, in detectObjectsFromImage
+    "Ensure you specified correct input image, input type, output type and/or output image path ")
+ValueError: Ensure you specified correct input image, input type, output type and/or output image path 
+
+elapsedSeconds:= 8.5718215
+no console attached.. 
+ mX4 executed: 05/07/2022 17:07:38  Runtime: 0:0:19.147  Memload: 48% use
+PascalScript maXbox4 - RemObjects & SynEdit
+
+person  :  93.67685317993164
+person  :  88.36732506752014
+person  :  47.98813462257385
+person  :  57.80964493751526
+person  :  20.172059535980225
+person  :  23.541299998760223
+laptop  :  40.84217548370361
+person  :  73.17650318145752
+person  :  49.881067872047424
+laptop  :  34.305983781814575
+laptop  :  28.4904807806015
+laptop  :  52.92931795120239
+laptop  :  22.237320244312286
+laptop  :  53.156620264053345
+clock  :  11.756037920713425
+person  :  10.25722622871399
+person  :  82.70611763000488
+person  :  70.5441951751709
+person  :  56.30279779434204
+person  :  33.18963050842285
+person  :  44.571322202682495
+laptop  :  10.280435532331467
+laptop  :  32.23412036895752
+laptop  :  12.679524719715118
+laptop  :  21.337680518627167
+laptop  :  52.31360197067261
+laptop  :  29.75689470767975
+integrate image detector compute ends...
+
+  2 bit key    - how many possibilities ?
+  2^2 = 4
+  
+  00
+  01
+  10
+  11
+  
+  Zeichenanzahl PW ^ Länge P
+  Passwortgenerator
+  
+  Zeichenzahl  12     = abhfgkADDFGZ2347
+  Länge mind.  20      64^6 = 
+  Nur Zahlen   10      10 ^ 10
+  
+  Universelle Bibliothek
+  ASCII 256  ^ 180 = 
+  
+  Command line: C:\Users\User\AppData\Local\Programs\Python\PYTHON~1\Scripts\pip.exe install -U cython pillow>=7.0.0 numpy>=1.18.1 opencv-python>=4.1.2 torch>=1.9.0 --extra-index-url https://download.pytorch.org/whl/cpu torchvision>=0.10.0 --extra-index-url https://download.pytorch.org/whl/cpu pytest==7.1.3 tqdm==4.64.1 scipy>=1.7.3 matplotlib>=3.4.
+Working directory: 
+
+Looking in indexes: https://pypi.org/simple, https://download.pytorch.org/whl/cpu, https://download.pytorch.org/whl/cpu
+Requirement already satisfied: cython in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (3.0.5)
+Collecting cython
+  Obtaining dependency information for cython from https://files.pythonhosted.org/packages/60/d0/30f3ecd4dcafa87cd024a2687a6be7aa14f94d75c040192f8f8629ef8ad8/Cython-3.0.7-cp311-cp311-win_amd64.whl.metadata
+  Downloading Cython-3.0.7-cp311-cp311-win_amd64.whl.metadata (3.2 kB)
+Requirement already satisfied: pillow>=7.0.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (10.1.0)
+Requirement already satisfied: numpy>=1.18.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (1.26.2)
+Requirement already satisfied: opencv-python>=4.1.2 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (4.8.1.78)
+Requirement already satisfied: torch>=1.9.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (2.1.0)
+Collecting torch>=1.9.0
+  Downloading https://download.pytorch.org/whl/cpu/torch-2.1.2%2Bcpu-cp311-cp311-win_amd64.whl (194.4 MB)
+     -------------------------------------- 194.4/194.4 MB 7.0 MB/s eta 0:00:00
+Requirement already satisfied: torchvision>=0.10.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (0.16.0+cpu)
+Collecting torchvision>=0.10.0
+  Downloading https://download.pytorch.org/whl/cpu/torchvision-0.16.2%2Bcpu-cp311-cp311-win_amd64.whl (1.1 MB)
+     ---------------------------------------- 1.1/1.1 MB 9.0 MB/s eta 0:00:00
+Requirement already satisfied: pytest==7.1.3 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (7.1.3)
+Requirement already satisfied: tqdm==4.64.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (4.64.1)
+Requirement already satisfied: scipy>=1.7.3 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (1.11.3)
+Collecting scipy>=1.7.3
+  Obtaining dependency information for scipy>=1.7.3 from https://files.pythonhosted.org/packages/43/d0/f3cd75b62e1b90f48dbf091261b2fc7ceec14a700e308c50f6a69c83d337/scipy-1.11.4-cp311-cp311-win_amd64.whl.metadata
+  Downloading scipy-1.11.4-cp311-cp311-win_amd64.whl.metadata (60 kB)
+     -------------------------------------- 60.4/60.4 kB 643.1 kB/s eta 0:00:00
+Requirement already satisfied: matplotlib>=3.4. in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (3.8.1)
+Collecting matplotlib>=3.4.
+  Obtaining dependency information for matplotlib>=3.4. from https://files.pythonhosted.org/packages/26/5a/27fd341e4510257789f19a4b4be8bb90d1113b8f176c3dab562b4f21466e/matplotlib-3.8.2-cp311-cp311-win_amd64.whl.metadata
+  Downloading matplotlib-3.8.2-cp311-cp311-win_amd64.whl.metadata (5.9 kB)
+Requirement already satisfied: attrs>=19.2.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pytest==7.1.3) (23.1.0)
+Requirement already satisfied: iniconfig in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pytest==7.1.3) (2.0.0)
+Requirement already satisfied: packaging in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pytest==7.1.3) (23.2)
+Requirement already satisfied: pluggy<2.0,>=0.12 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pytest==7.1.3) (1.3.0)
+Requirement already satisfied: py>=1.8.2 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pytest==7.1.3) (1.11.0)
+Requirement already satisfied: tomli>=1.0.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pytest==7.1.3) (2.0.1)
+Requirement already satisfied: colorama in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pytest==7.1.3) (0.4.6)
+Requirement already satisfied: filelock in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from torch>=1.9.0) (3.13.1)
+Requirement already satisfied: typing-extensions in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from torch>=1.9.0) (4.8.0)
+Requirement already satisfied: sympy in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from torch>=1.9.0) (1.12)
+Requirement already satisfied: networkx in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from torch>=1.9.0) (3.2.1)
+Requirement already satisfied: jinja2 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from torch>=1.9.0) (3.1.2)
+Requirement already satisfied: fsspec in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from torch>=1.9.0) (2023.10.0)
+Requirement already satisfied: requests in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from torchvision>=0.10.0) (2.31.0)
+Requirement already satisfied: contourpy>=1.0.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from matplotlib>=3.4.) (1.2.0)
+Requirement already satisfied: cycler>=0.10 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from matplotlib>=3.4.) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from matplotlib>=3.4.) (4.44.1)
+Requirement already satisfied: kiwisolver>=1.3.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from matplotlib>=3.4.) (1.4.5)
+Requirement already satisfied: pyparsing>=2.3.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from matplotlib>=3.4.) (3.1.1)
+Requirement already satisfied: python-dateutil>=2.7 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from matplotlib>=3.4.) (2.8.2)
+Requirement already satisfied: six>=1.5 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from python-dateutil>=2.7->matplotlib>=3.4.) (1.16.0)
+Requirement already satisfied: MarkupSafe>=2.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from jinja2->torch>=1.9.0) (2.1.3)
+Requirement already satisfied: charset-normalizer<4,>=2 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from requests->torchvision>=0.10.0) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from requests->torchvision>=0.10.0) (3.4)
+Requirement already satisfied: urllib3<3,>=1.21.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from requests->torchvision>=0.10.0) (2.1.0)
+Requirement already satisfied: certifi>=2017.4.17 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from requests->torchvision>=0.10.0) (2023.7.22)
+Requirement already satisfied: mpmath>=0.19 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from sympy->torch>=1.9.0) (1.3.0)
+Downloading Cython-3.0.7-cp311-cp311-win_amd64.whl (2.8 MB)
+   ---------------------------------------- 2.8/2.8 MB 9.9 MB/s eta 0:00:00
+Downloading scipy-1.11.4-cp311-cp311-win_amd64.whl (44.1 MB)
+   ---------------------------------------- 44.1/44.1 MB 10.2 MB/s eta 0:00:00
+Downloading matplotlib-3.8.2-cp311-cp311-win_amd64.whl (7.6 MB)
+   ---------------------------------------- 7.6/7.6 MB 11.4 MB/s eta 0:00:00
+Installing collected packages: scipy, cython, torch, matplotlib, torchvision
+  Attempting uninstall: scipy
+    Found existing installation: scipy 1.11.3
+    Uninstalling scipy-1.11.3:
+      Successfully uninstalled scipy-1.11.3
+  Attempting uninstall: cython
+    Found existing installation: Cython 3.0.5
+    Uninstalling Cython-3.0.5:
+      Successfully uninstalled Cython-3.0.5
+  Attempting uninstall: torch
+    Found existing installation: torch 2.1.0
+    Uninstalling torch-2.1.0:
+      Successfully uninstalled torch-2.1.0
+  Attempting uninstall: matplotlib
+    Found existing installation: matplotlib 3.8.1
+    Uninstalling matplotlib-3.8.1:
+      Successfully uninstalled matplotlib-3.8.1
+  Attempting uninstall: torchvision
+    Found existing installation: torchvision 0.16.0+cpu
+    Uninstalling torchvision-0.16.0+cpu:
+      Successfully uninstalled torchvision-0.16.0+cpu
+Successfully installed cython-3.0.7 matplotlib-3.8.2 scipy-1.11.4 torch-2.1.2+cpu torchvision-0.16.2+cpu
+
+[notice] A new release of pip is available: 23.2.1 -> 23.3.1
+[notice] To update, run: C:\Users\User\AppData\Local\Programs\Python\Python311\python.exe -m pip install --upgrade pip
+
+Process "Install Packages with pip" terminated, ExitCode: 00000000
+
+----Simple Browser started----
