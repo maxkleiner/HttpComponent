@@ -1,0 +1,820 @@
+program APILayer_World_News_API1_5_2Formbeta;
+
+//note: if an image exception occurs we try to open origing web link
+//{$IFDEF Lazarus}
+//  {$APPTYPE CONSOLE}  ☮ ✞ π 📌  JSON Lang Translate Example  📥 ⚙️ 🖥️ 🌐 🧠 📦  🎯
+//{/$ENDIF}
+//https://apilayer.com/marketplace/image_to_text-api?txn=free&e=Sign%20Up&l=Success&live_demo=show
+//https://blogs.doctranslate.io/2025/05/13/ja/google-translation-api-key-explained-simply-with-examples/
+//https://simplelocalize.io/blog/posts/best-free-translation-tools-for-developers/
+//https://www.autoitscript.com/forum/topic/153314-multipart-file-uploading-using-winhttpwinhttprequest51/
+//https://www.edenai.co/post/top-free-translation-tools-apis-and-open-source-models
+                                               
+const
+  SUSERAgent = 'Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101';
+  USERAGENT5 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'+
+                   ' Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 '; 
+ 
+  //https://barcodeapi.org/api/' + LowerCase(BarcodeType) + '/' + TIdURI.ParamsEncode(Data);
+  URL_APILAY_BARCODE = 'https://barcodeapi.org/api/%s/%s';
+  URL_APILAY_FACTS = 'https://api.api-ninjas.com/v1/facts';
+  
+  //N_APIKEY = 'our own api key in NINJAAPIKEY.INC';      //change of release to .inc
+  
+  URLIMAGEPATH = 'http://www.kleiner.ch/kleiner/images/uml_buch.jpg';
+  URLIMAGEPATH2 = 'http://www.kleiner.ch/kleiner/patterns_klein.gif';
+  URLIMAGEPATH3 = 'https://breitschtv.wordpress.com/wp-content/uploads/2024/04/scripttest_latin_20240316_133552.jpg?w=768';
+  URLIMAGEPATH4 = 'https://softwareschule.code.blog/wp-content/uploads/2023/12/lima-309157-db-ard4um-tee-barwagen.jpg';
+
+  TESTURL = 'https://graphical.weather.gov/xml/DWMLgen/schema/latest_DWML.txt';
+  TESTURL2 = 'https://maxbox4.wordpress.com/2024/03/06/geocoding-iv/';
+  TESTSTRING = 'https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=ja&q=bonjour';        
+
+  {$I .\NINJAAPIKEY2.INC}
+  
+  NINJA_APIKEY2 =  'gwM+25ePKB_______your___________________ own key';
+  WORLDNEWS_APIKEY2 = '977797ff___________your own api key';
+  TBASE_JAZZURL9 = 'https://binaryjazz.us/wp-json/genrenator/v1/story/%d/';
+  TBASE_WORLDNEWSAPI_URL10 = 'https://api.worldnewsapi.com/search-news?text=%s&language=%s&number=%d&earliest-publish-date=2026-04-01';
+
+
+//https://jsonplaceholder.typicode.com/guide/
+
+procedure TForm1ExportCreateResource_API_Post(Sender: TObject);
+var httpreq: THttpRequestC; 
+    JSONStr: string;
+  begin
+     httpreq:= THttpRequestC.create(self);
+     httpreq.headers.add('Content-type: application/json; charset=UTF-8');
+     try
+       //JSONStr:= GeoJSON.Stringify; //ToJSON;
+       JSONStr:= '{' +
+       '"title": "gpt-3.6-turbo-instruct",'+
+       //'"prompt": "%s",'+
+       '"body": "gpt-3.6-bar",'+
+       '"userId": 1'+            
+       '}';
+
+       Memo2.Lines.Add('Post JSON created: ' + JSONStr);
+       try
+         writeln(formatJson(JSONStr));
+       except
+         write('JSON FormatError: '+ExceptiontoString(exceptiontype,exceptionparam)); 
+       end;  
+       if httpreq.Post2('https://jsonplaceholder.typicode.com/posts/',JSONStr) then begin
+         Memo2.Lines.Add('API Response: '+formatJson(httpreq.Response.contentasstring));
+         writ('content-length:'+itoa(httpreq.response.Contentlength));
+       end;
+     except
+     //on E: Exception do
+       write('REQC_Err: '+ExceptiontoString(exceptiontype,exceptionparam));   
+     finally
+       httpreq.Free;  //THttpRequestC; 
+     end;  
+  end;
+
+function APIBarcode2(AURL, atype, url_name, afile: string): boolean;
+var httpq: THttpConnectionWinInet;
+    rets: TMemoryStream;  
+    heads: TStrings; iht: IHttpConnection; //losthost:THTTPConnectionLostEvent;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  rets:= TMemoryStream.create;
+  //heads:= TStringlist.create;     
+  try 
+    //heads.add('Accept=image/jpg');
+    writ(Format(AURL,[urlencode(atype),urlencode(url_name)]))
+    //iht:= httpq.setHeaders(heads);
+    httpq.Get(Format(AURL,[urlencode(atype),urlencode(url_name)]), rets);
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+        // Add the '.png' extension to the FileName
+       //FileName := ChangeFileExt(FileName, '.png');
+       rets.savetofile(afile);
+       openfile(afile);
+       result:= true;
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+    result:= false;
+  finally
+    httpq:= Nil;
+    //heads.Free;
+    rets.Free;
+  end;                  
+end;                 //}
+
+
+function PyCodeObjectDetect2(imgpath, aAPIKey: string): string;
+begin
+  with TPythonEngine.Create(Nil) do begin
+  //pythonhome:= 'C:\Users\User\AppData\Local\Programs\Python\Python312\';
+  try
+    loadDLL;
+    autofinalize:= false;
+    ExecString('import requests');
+    ExecStr('url= "https://api.api-ninjas.com/v1/objectdetection"'); 
+    ExecStr('image_file_descriptor = open("'+imgpath+'","rb")');  
+    ExecStr('headers= {"X-Api-Key":"'+aAPIKey+'"}'); 
+    ExecStr('files = {"image": image_file_descriptor}  ');
+    ExecStr('r = requests.post(url, headers=headers, files=files)');
+    result:= (EvalStr('r.json()')); 
+  except
+    raiseError;        
+  finally       
+    Free;
+  end; 
+ end;
+end; 
+
+type
+  TForm16 = TForm;
+  var
+    cbb1: TComboBox;
+    ed1: TEdit;
+    btn1, btn2: TBitBtn;
+    tex1: TMemo;
+    lbl1: TLabel;
+    lbl11: TLabel;
+    img11: TImage;
+    spanel: TPanel;
+    procedure btn1Click(Sender: TObject); forward;
+    function World_News_API55(AURL, searchtext, language: string; anumb: byte):string; forward;
+  //private
+    { Private declarations }
+  //public
+    { Public declarations }
+  //end;   anatomie einer zeichenkette
+  
+var
+  Form16: TForm16;  
+  
+type TNewsrecord = record
+        ftext, ftitle, fsummary: string;
+        fsentiment,fimage,furl: string;
+        //fprob, fprob2, fprobtot: double;
+      end;
+  var newsrecord: TNewsrecord;  
+  
+  var newsrecarray: array[0..6] of TNewsrecord;
+  
+  
+procedure {TForm16.}btn1Click(Sender: TObject);
+var Code_Type :string;
+ begin
+   case cbb1.ItemIndex of
+     1: begin
+        Code_Type:='aztec';
+      end;
+     2: begin
+        Code_Type:='codabar';
+      end;
+     3: begin
+        Code_Type:='39';
+      end;
+     4: begin
+        Code_Type:='128';
+      end;
+     5: begin
+        Code_Type:='dm';
+      end;
+      6: begin
+        Code_Type:='8';
+        writ('code 8')
+      end;
+      7: begin
+        Code_Type:='13';
+      end;
+      8: begin
+        Code_Type:='417';
+      end;
+      9: begin
+        Code_Type:='qr';
+      end;
+   end; 
+   begin
+      Writ(World_News_API55(TBASE_WORLDNEWSAPI_URL10, ed1.text, 'en', 7));  
+   (*  //if TBarcodeDownloader.DownloadBarcode(Code_Type, ed1.Text, 'gen.png') then
+     if APIBarcode2(URL_APILAY_BARCODE, code_type, ed1.text, exepath+'examples\barcode12.png') then
+     begin
+       if (Code_Type = 'qr') or (code_type = 'dm') or (code_type = 'aztec') then
+         //img1.Picture.LoadFromFile(exepath+'examples\barcode12.png')
+       else
+         //img11.Picture.LoadFromFile(exepath+'examples\barcode12.png');
+     end else
+     begin
+       ShowMessage('Failed to download the barcode image.');
+     end;  *)
+   end; 
+ end;
+ 
+procedure {TForm16.}btn2Click(Sender: TObject);
+var Code_Type :string;
+ begin
+    //  Writ(World_News_API55(TBASE_WORLDNEWSAPI_URL10, ed1.text, 'en', 7));  
+     //openWeb(StrTrimQuotes(newsrecord.furl))
+     openWeb(newsrecarray[cbb1.ItemIndex].furl);
+     //jobj['url'].decode(jobj['url'].stringify)
+ end;
+
+ 
+//https://www.swissdelphicenter.com/en/showcode.php?id=2391
+function DownloadJPGToBitmap(const URL : string; ABitmap: TBitmap): Boolean;
+var
+  idHttp: TIdHTTP;
+  ImgStream: TMemoryStream;
+  JpgImage: TJPEGImage;
+begin
+  Result:= False;
+  ImgStream:= TMemoryStream.Create;
+  try
+    //idHttp:= TIdHTTP.Create(nil);
+    try
+      //idHttp.Get(URL, ImgStream);
+      Http_GetStream(URL, imgstream);
+    finally
+      //idHttp.Free;
+    end;
+    sleep(200) ;
+    ImgStream.Position:= 0;
+    JpgImage := TJPEGImage.Create;
+    try
+      JpgImage.LoadFromStream(ImgStream);
+      ABitmap.Assign(JpgImage);
+    finally
+      Result := True;
+      JpgImage.Free;
+    end;
+  finally
+    ImgStream.Free;
+  end;
+end;
+ 
+var  
+  mapStream:TMemoryStream;
+ 
+function World_News_API55(AURL, searchtext, language: string; anumb: byte):string;
+var httpq: THttpRequestC; //THttpConnectionWinInet;
+    jo: TJSON; jarr:TJsonArray2;jobj: TJSonObject2; urlback: string;
+    Bmp: TBitmap;
+  begin
+    mapStream:= TMemoryStream.create;
+    Bmp:= TBitmap.Create;
+    httpq:= THttpRequestC.create(self); 
+    httpq.headers.add('Accept:application/json; charset=utf-8');
+    httpq.headers.add('x-api-key:'+WORLDNEWS_APIKEY);
+    //httpq.SecurityOptions:= [soSsl3,soPct,soIgnoreCertCNInvalid];
+    try
+       writ('requrl: '+wideFormat(AURL,[searchtext,language,anumb]));
+       httpq.Get(wideFormat(AURL,[searchtext,language,anumb]));
+       writ('http get status '+itoa(httpq.response.statuscode2));
+       urlback:= httpq.response.ContentAsUTF8String;
+       writ('ctype transback: '+(httpq.response.Contenttype));
+       jo:= TJSON.Create();
+       //StringReplace( backstr, '\n\n', CR+LF,[rfReplaceAll]); 
+       writ(StringReplace(formatjson(urlback),'\n', CRLF,[rfReplaceAll]))
+       jo.parse((urlback)); 
+       jobj:= jo.JsonObject;
+       cbb1.clear;
+       cbb1.Text:= 'Select News Topic'
+       if httpq.response.statuscode2=200 Then begin
+          //result:=jobj[0].decode(urlback)
+          //result:=jobj['news'].decode(urlback);
+           jarr:=jobj['news'].asarray;
+           //jarr.decode(jarr.stringify)
+           for it:= 0 to jarr.count-1 do begin
+             jobj:= jarr.items[it].asobject;
+             result:= result+CRLF+itoa(it)+' '+jobj['title'].decode(jobj['title'].stringify);
+             result:= result+' sent: '+jobj['sentiment'].stringify;
+             result:= result+' src: '+jobj['source_country'].stringify;
+             //result:= result+CRLF+'  summary: '+jobj['summary'].stringify;
+             cbb1.items.add(itoa(it)+' '+htmldecode(jobj['title'].decode(jobj['title'].stringify)));
+             newsrecarray[it].ftitle:=  jobj['title'].decode(jobj['title'].stringify);
+             newsrecarray[it].ftext:=  StringReplace(jobj['text'].decode(jobj['text'].stringify),
+                                           '.', '.'+CRLF,[rfReplaceAll]);
+             newsrecarray[it].fsummary:=  jobj['summary'].decode(jobj['summary'].stringify);                                  
+             newsrecarray[it].fimage:=  StrTrimQuotes(jobj['image'].decode(jobj['image'].stringify));
+             newsrecarray[it].furl:=  StrTrimQuotes(jobj['url'].decode(jobj['url'].stringify)); 
+             newsrecarray[it].fsentiment:=  jobj['sentiment'].stringify;                              
+           end; 
+           //StringReplace(formatjson(urlback),'\n', CRLF,[rfReplaceAll]))
+           tex1.text:= StringReplace(jobj['text'].decode(jobj['text'].stringify),
+                                              '.', '.'+CRLF,[rfReplaceAll]);
+          // tex1.text:= jobj['text'].decode(jobj['text'].stringify);
+           //)writ('response headers '+httpq.response.headers.tostring);    
+           writ('response headers quota used:'+httpq.response.headers.getfirst('X-API-Quota-Used')); 
+           writ('response headers quota left:'+httpq.response.headers.getfirst('X-API-Quota-Left'));                                 
+           newsrecord.fimage:=  jobj['image'].decode(jobj['image'].stringify);
+           newsrecord.furl:=  jobj['url'].decode(jobj['url'].stringify);
+           writ('debug '+StrTrimQuotes(newsrecord.fimage));
+           //Http_GetStream(newsrecord.fimage, mapstream);
+           //mapStream.Position:= 0;
+            Wininet_HttpGet(StrTrimQuotes(newsrecord.fimage), mapstream);
+           //mapStream.Position:= 0;
+            writ('debug size: '+itoa(mapstream.size))
+            DownloadJPGToBitmap(StrTrimQuotes(newsrecord.fimage), img11.Picture.bitmap);
+           //img11.Picture.bitmap.LoadFromStream(mapstream); 
+           //bmp.loadfromstream(mapstream);
+       end else result:='REST API Failed:'+
+                itoa(Httpq.response.statuscode2)+httpq.response.headers.tostring; 
+    except
+       writ('EWI_HTTPS: '+ExceptiontoString(exceptiontype,exceptionparam));
+    finally
+       httpq.free;
+       httpq:= Nil;
+       jo.free; 
+       mapstream.free;   
+       bmp.free;                                                                                                                                           
+    end;                                                                                                         
+  end;
+
+procedure TFrm1_comboboxchange(Sender: TObject);
+begin
+  if cbb1.Tag <> cbb1.ItemIndex then begin
+    cbb1.Tag:= cbb1.ItemIndex;
+    // this action invokes only if selection is different from before:
+    //CodeSite.Send('TForm1.cbbTestChange: ', cbbTest.Items[cbbTest.ItemIndex]);
+    writ('TForm1.cbbTestChange: '+ (cbb1.Items[cbb1.ItemIndex])); 
+    try
+      DownloadJPGToBitmap(StrTrimQuotes(newsrecarray[cbb1.ItemIndex].fimage), img11.Picture.bitmap);
+    except 
+      writ('JPeg Error we open origin source: '+ExceptiontoString(exceptiontype,exceptionparam)); 
+      openWeb(newsrecarray[cbb1.ItemIndex].furl);
+    end;  
+    tex1.text:=  newsrecarray[cbb1.ItemIndex].ftext;
+    spanel.caption:=  'Sentiment: '+newsrecarray[cbb1.ItemIndex].fsentiment;
+    //newsrecarray[it].fimage
+  end;
+end;
+
+procedure TFrm1_MemoClick(Sender: TObject);
+  begin
+    //actlocation:= removespaces(myedit.text);
+    //actlocation:= TrimSpacesL(myedit.text);
+    if cbb1.ItemIndex > 0 then 
+      tex1.text:=  newsrecarray[cbb1.ItemIndex].fsummary;
+    //TFrm_updateclick(self)
+  end;
+
+procedure EnableHorizontalScroll(AComboBox: TComboBox);
+var
+  i, MaxWidth: Integer;
+  DC: HDC;
+  Size: TSize;
+begin
+  MaxWidth := 0;
+  DC := GetDC(AComboBox.Handle);
+  try
+    for i := 0 to AComboBox.Items.Count - 1 do begin
+     // GetTextExtentPoint32(DC, PChar(AComboBox.Items[i]),
+        //Length(AComboBox.Items[i]), Size);
+      if Size.cx > MaxWidth then
+        MaxWidth := Size.cx;
+    end;
+  finally
+    ReleaseDC(AComboBox.Handle, DC);
+  end;
+  // Set horizontal extent (scrollbar width)
+  SendMessage(AComboBox.Handle, CB_SETHORIZONTALEXTENT, MaxWidth + 4, 0);
+end;
+
+procedure setBCForm;
+ begin
+ Form16:= TForm16.create(self);
+   with form16 do begin
+     Left:= 0
+     Top:= 0
+     Caption:= 'World News API Central5'
+     ClientHeight:= 595;
+     ClientWidth:= 995
+     Color:= clBtnFace
+     Font.Charset:= DEFAULT_CHARSET
+     Font.Color:= clWindowText
+     Font.Height:= -11
+     Font.Name:= 'Tahoma'
+     Font.Style:= []
+     OldCreateOrder:= False
+     PixelsPerInch:= 96
+     BorderIcons:= [biSystemMenu, biMinimize]
+     BorderStyle:= bsSingle
+     icon.loadfromresourcename(hinstance, 'xgmaps');//'maxearth'); //'XCrypto'); //'Piano');
+
+     show;
+     //TextHeight:= 13
+     tex1:= TMemo.create(form16)
+     with tex1 do begin
+      parent:= form16;
+       Left:= 180; Top:= 72
+       Width:= 383; Height:= 510;
+       font.size:= 10;
+       wordwrap:= true;
+       ScrollBars:= ssVertical;
+       showhint:= true;
+       hint:= ' Dbl click for summary! ';
+       ondblclick:=  @TFrm1_MemoClick;
+       //Picture.bitmap.LoadFromResourceName(HINSTANCE, 'TASBARCODE'); 
+        //Stretch:= True
+     end;
+     lbl1:= TLabel.create(form16)
+     with lbl1 do begin
+      parent:= form16;
+       Left:= 8
+       Top:= 8
+       Width:= 98
+       Height:= 13
+       Caption:= 'Select News Record:'
+     end;
+     lbl11:= TLabel.create(form16)
+     with lbl11 do begin
+      parent:= form16;
+       Left:= 8
+       Top:= 65
+       Width:= 103
+       Height:= 13
+       //font.size:=10;
+       Caption:= 'Write Search Text'
+     end;
+     img11:= TImage.create(form16)
+     with img11 do begin
+     parent:= form16;
+       Left:= 573
+       Top:= 72
+       Width:= 405
+       Height:= 305
+       //Picture.Data:= 
+       Picture.bitmap.LoadFromResourceName(HINSTANCE, 'TASBARCODE'); 
+       //Picture.bitmap.LoadFromStream(HINSTANCE, 'TASBARCODE'); 
+       Stretch:= True
+     end;
+     cbb1:= TComboBox.create(form16)
+     with cbb1 do begin
+      parent:= form16;
+       Left:= 8
+       Top:= 25
+       Width:= 975
+       Height:= 31
+       ItemIndex:= 0
+       TabOrder:= 0
+       font.size:= 10;
+       Text:= 'Select News Topic'
+       //Items.add('Select')
+        (* items.add('Aztec ');
+         items.add('Codabar')
+         items.add('Code39')
+         items.add('Code128')
+         items.add('Data Matrix')
+         items.add('EAN-8')
+         items.add('EAN-13')
+         items.add('PDF-417')
+         items.add('QR Code')   *)
+       Tag := ItemIndex;  
+       OnChange:= @TFrm1_comboboxchange;  
+     end;
+     ed1:= TEdit.create(form16)
+     with ed1 do begin
+      parent:= form16;
+       Left:= 8
+       Top:= 82
+       Width:= 165
+       Height:= 21
+       font.size:= 10;
+       TabOrder:= 1
+       Text:= 'Set search text:'
+     end;
+     btn1:= TBitbtn.create(form16)
+     with btn1 do begin
+      parent:= form16
+       Left:= 8
+       Top:= 138
+       Width:= 145
+       Height:= 40
+       font.size:= 10;
+       Caption:= 'Set Search'
+       glyph.LoadFromResourceName(getHINSTANCE,'CL_MPPAUSE');
+       TabOrder:= 2
+       OnClick:= @btn1Click;
+     end;
+     btn2:= TBitbtn.create(form16)
+     with btn2 do begin
+      parent:= form16
+       Left:= 8
+       Top:= 188
+       Width:= 145
+       Height:= 40
+       font.size:= 10;
+       Caption:= 'Get URL...'
+       glyph.LoadFromResourceName(getHINSTANCE,'CL_MPSTOP');
+       TabOrder:= 2
+       OnClick:= @btn2Click;
+     end;
+     spanel:= TPanel.Create(form16); 
+     with spanel do begin
+      Parent:= form16;        
+      SetBounds(573,390,350,25)
+      font.size:= 11;
+      BevelOuter:= bvLowered
+      Caption:= 'Sentiment Analysis'
+      Color:= clyellow;//$30809000;
+      //Color:= 8404992
+    end;
+   end;
+end; 
+
+const
+  cFileName = 'fmain.pas';
+
+var validtext, atext: string;  IdDecoderMIME: TIdDecoderMIME;
+    t_latlong: TLatlong;
+
+Begin //@main
+  //FilelessWB2PNG('https://www.pngrepo.com/png/429486/60/digger-excavator-shovel.png');
+  //FilelessWB2PNG('https://wiki.gnome.org/Apps/EyeOfGnome?action=AttachFile&do=get&target=screenshot.png');
+  
+  { backstr:= parseJsonvalue(GEO_to_text_API2_emoji(URL_APILAY_EMO, 'slightly smiling face', 
+                                          N_APIKEY));
+    validtext:= StringReplace( backstr, '\n', CR+LF,[rfReplaceAll]); 
+   writeln(validtext);    // U+1F642 }
+   writeln(#$d83d#$de42);  
+   //setdebugOFF;     
+   maxform1.setconsole;
+   
+   //)writeln(GEO_to_text_API2_randimage3(URL_APILAY_IMG, 'nature',
+   //                                  'N_APIKEY', exepath+'randimage022.jpg'));
+   // println(PyCodeObjectDetect2('./randimage01bee.jpg', N_APIKEY)); 
+      sleep(500);   
+   // println(PyCodeObjectDetect2('./randimage012.jpg', N_APIKEY));   
+   { backstr:= HTTPClsComponentAPIDetection2(URL_APILAY_DETECT,'', N_APIKEY,'./randimage022.jpg');
+    println('JSONback '+formatjson2((backstr),3));
+     // } 
+   sleep(200)
+   setdebugcheck(true);
+ 
+   //writ(list_modules(exepath+'maxbox5_14beta80.exe'));  
+   //TForm1ExportCreateResource_API_Post(self);
+                                                                   
+  // APIBarcode(URL_APILAY_BARCODE, 'qr', 'maXbox5', exepath+'examples\barcode2qr.png');
+   //FreeTranlate_API_Post(self,TBASE_URcL8);     
+   SetBCForm();     
+   Writ(World_News_API55(TBASE_WORLDNEWSAPI_URL10, 'Technic', 'en', 7));                                       
+                                           
+end.
+
+ref: https://teetrain2.wordpress.com/2026/04/15/worldnewsapi/
+
+doc: summary text with dlb click on text memo!
+
+ref: If you select the same entry multiple times in a TComboBox dropdown list, the OnChange event is triggered each time. 
+This actually contradicts the semantic meaning of the word "Change," since no "change" of the ItemIndex property occurs 
+when the same entry is selected repeatedly.
+
+when an jpeg exception occurs like not recognise jpeg: we open the origin
+https:\/\/assets.thelocal.com\/cdn-cgi\/rs:fit:1200\/quality:75\/plain\/
+https:\/\/apiwp.thelocal.com\/wp-content\/uploads\/2026\/04\/20241211-210400-L-1920x1280web.jpg@webp
+
+type
+  THeaders = class(TStringList)
+  private
+    procedure FromRawString(AStringHeaders: String);
+  public
+    constructor Create;
+    procedure AddHeader(AName, AValue: String);
+    function GetAll(AName: String): TStrings;
+    function GetFirst(AName: String): String;
+    function ToString: String; override;
+  end;                                        
+Auto Aztec CODABAR Code 128 Code 39 DataMatrix EAN 13 EAN 8 ITF-14 PDF-417 QR Code
+UPC A UPC E More Types
+https://barcodeapi.org/index.html#128
+
+Ref:   case cbb1.ItemIndex of
+    1:       begin
+        Code_Type:='aztec';
+      end;
+    2:       begin
+        Code_Type:='codabar';
+      end;
+    3:       begin
+        Code_Type:='39';
+      end;
+      4:       begin
+        Code_Type:='128';
+      end;
+      5:       begin
+        Code_Type:='dm';
+      end;
+      6:       begin
+        Code_Type:='8';
+      end;
+      7:       begin
+        Code_Type:='13';
+      end;
+      8:       begin
+        Code_Type:='417';
+      end;
+      9:       begin
+        Code_Type:='qr';
+      end;
+
+https://www.npmjs.com/package/google-translate-api-jp?activeTab=readme 
+     https://www.sljfaq.org/afaq/encodings.html
+     コーディングとデザインの街から友人の皆さんへ
+     https://github.com/ssut/py-googletrans/issues/268
+     https://www.geeksforgeeks.org/python/how-to-make-a-google-translation-api-using-python/
+http://www.rolandmuseum.de/syn_ana.php
+https://www.coderstool.com/unicode-text-converter
+
+
+https://medium.com/@abhay.anand/day-3-linux-commands-you-should-know-65fb849561cc
+https://medium.com/100-days-of-linux/7-fundamental-use-cases-of-netcat-866364eb1742
+https://medium.com/@saravra/how-to-study-cybersecurity-64ee0478e87e
+
+(502) 875 err:20
+EWI_HTTP: Exception: Can not send REST message 
+https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=auto&tl=ja&q=bonjour mes amis da la ville of 
+coding avec design, error: Bad Gateway (502)
+debug: 222- 875 err:21
+debug: 207-The requested header could not be located. 878 err:20
+REQC_Err: Exception: The requested header could not be located.
+
+New in maXbox 5.2.9.198 (September 30, 2025)
+New in maXbox 5.1.4.98 (June 30, 2024)
+New in maXbox 5.1.4.95 (April 17, 2024)
+New in maXbox 5.1.4.90 (March 21, 2024)
+New in maXbox 4.7.6.50 (June 15, 2023)
+New in maXbox 4.7.6.20 (December 15, 2022)
+New in maXbox 4.7.6.10 (November 12, 2021)
+New in maXbox 4.7.5.80 (July 22, 2021)
+New in maXbox 4.7.4.64 (June 14, 2020)
+
+unit uPSI_Jsons;
+{
+jsodn for python php js  kotlin pascal
+  rename TJsonObject to TJsonObject2
+
+}
+interface
+ 
+uses
+   SysUtils
+  ,Classes
+  ,uPSComponent
+  ,uPSRuntime
+  ,uPSCompiler
+  ;
+ 
+type 
+(*----------------------------------------------------------------------------*)
+  TPSImport_Jsons = class(TPSPlugin)
+  public
+    procedure CompileImport1(CompExec: TPSScript); override;
+    procedure ExecImport1(CompExec: TPSScript; const ri: TPSRuntimeClassImporter); override;
+  end;
+ 
+ 
+{ compile-time registration functions }
+procedure SIRegister_TJson(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonObject2(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonPair(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonArray2(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonValue(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonBase(CL: TPSPascalCompiler);
+procedure SIRegister_Jsons(CL: TPSPascalCompiler);
+
+{ run-time registration functions }
+procedure RIRegister_TJson(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonObject2(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonPair(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonArray2(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonValue(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonBase(CL: TPSRuntimeClassImporter);
+procedure RIRegister_Jsons(CL: TPSRuntimeClassImporter);
+
+procedure Register;
+
+implementation
+
+
+uses
+   jsonsutilsEx
+  ,Jsons
+  ;
+
+ //type  TJsonObject2  = TJsonObject;
+   //    TJsonArray2 = TJsonArray;
+
+ 
+procedure Register;
+begin
+  RegisterComponents('Pascal Script', [TPSImport_Jsons]);
+end;
+
+(* === compile-time registration functions === *)
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonObject2(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonObject') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonObject2') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Merge( Addition : TJsonObject2)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Function Add( const Name : String) : TJsonPair');
+    RegisterMethod('Function Insert( const Index : Integer; const Name : String) : TJsonPair');
+    RegisterMethod('Function Put9( const Name : String; const Value : TJsonEmpty) : TJsonValue;');
+    RegisterMethod('Function Put10( const Name : String; const Value : TJsonNull) : TJsonValue;');
+    RegisterMethod('Function Put11( const Name : String; const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Put12( const Name : String; const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Put13( const Name : String; const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Put14( const Name : String; const Value : String) : TJsonValue;');
+    RegisterMethod('Function Put15( const Name : String; const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Put16( const Name : String; const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Put17( const Name : String; const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Function Put18( const Value : TJsonPair) : TJsonValue;');
+    RegisterMethod('Function Putbool( const Name : String; const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Putint( const Name : String; const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Putext( const Name : String; const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Putstr( const Name : String; const Value : String) : TJsonValue;');
+    RegisterMethod('Function Putarr( const Name : String; const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Putobj( const Name : String; const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Putval( const Name : String; const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Function Putpair( const Value : TJsonPair) : TJsonValue;');
+
+    RegisterMethod('Function Find( const Name : String) : Integer');
+    RegisterMethod('Procedure Delete19( const Index : Integer);');
+    RegisterMethod('Procedure Delete20( const Name : String);');
+    RegisterMethod('Procedure Clear');
+    RegisterProperty('Count', 'Integer', iptr);
+    RegisterProperty('Items', 'TJsonPair Integer', iptr);
+    RegisterProperty('Values', 'TJsonValue String', iptr);
+    SetDefaultPropery('Values');
+    RegisterProperty('AutoAdd', 'Boolean', iptrw);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonPair(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonPair') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonPair') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase; const AName : String)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterProperty('Name', 'String', iptrw);
+    RegisterProperty('Value', 'TJsonValue', iptr);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonArray2(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonArray2') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonArray2') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Merge( Addition : TJsonArray2)');
+    RegisterMethod('Function Add : TJsonValue');
+    RegisterMethod('Function Insert( const Index : Integer) : TJsonValue');
+    RegisterMethod('Function Put0( const Value : TJsonEmpty) : TJsonValue;');
+    RegisterMethod('Function Put1( const Value : TJsonNull) : TJsonValue;');
+    RegisterMethod('Function Put2( const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Put3( const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Put4( const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Put5( const Value : String) : TJsonValue;');
+    RegisterMethod('Function Put6( const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Put7( const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Put8( const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Procedure Delete( const Index : Integer)');
+    RegisterMethod('Procedure Clear');
+    RegisterProperty('Count', 'Integer', iptr);
+    RegisterProperty('Items', 'TJsonValue Integer', iptr);
+    SetDefaultPropery('Items');
+  end;
+end;
+
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_Jsons(CL: TPSPascalCompiler);
+begin
+  CL.AddTypeS('TJsonValueType', '( jvNone, jvNull, jvString, jvNumber, jvBoolean, jvObject, jvArray )');
+  CL.AddTypeS('TJsonStructType', '( jsNone, jsArray, jsObject )');
+  CL.AddTypeS('TJsonNull', '( jsnull2 )');
+  CL.AddTypeS('TJsonEmpty', '( jsempty )');
+  SIRegister_TJsonBase(CL);
+  CL.AddClassN(CL.FindClass('TOBJECT'),'TJsonObject2');
+  CL.AddClassN(CL.FindClass('TOBJECT'),'TJsonArray2');
+  SIRegister_TJsonValue(CL);
+  SIRegister_TJsonArray2(CL);
+  SIRegister_TJsonPair(CL);
+  SIRegister_TJsonObject2(CL);
+  SIRegister_TJson(CL);
+end;
