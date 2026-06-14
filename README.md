@@ -91,3 +91,6 @@ begin
 end;
 ```
 
+<img width="1416" height="993" alt="1481_codeguiScreenshot2026-06-14145656" src="https://github.com/user-attachments/assets/d299ab34-6794-4cce-8602-ba92903b69a6" />
+
+
