@@ -38,6 +38,11 @@ println(TestHTTPClassComponentAPIDetection2(URL_APILAY_DETECT,' askstream',N_API
 
 <img width="999" height="642" alt="1481Screenshot2026-04-23120305" src="https://github.com/user-attachments/assets/25698bf7-ff9d-4fcf-b0ec-e908c7d38231" />
 
+This function fetches news from a World News API endpoint, parses the JSON response, fills UI fields with article data, and downloads the first article image into an image control. It also returns a text summary of the articles it found, a sentiment analysis or an error message if the HTTP request fails. newsapi
+Further you can translate the text with another API.
+
+<img width="999" height="642" alt="1481_AIScreenshot2026-06-13220707" src="https://github.com/user-attachments/assets/5a4a44a5-480a-4cae-a9f0-2d087206b6b7" />
+
 ## How to use
 
 ### GET
